@@ -7,6 +7,7 @@ import (
 	"github.com/stellaraf/go-sfdc/types"
 )
 
+// Retrieve an Account.
 func (client *Client) Account(id string) (account types.Account, err error) {
 	err = client.prepare()
 	if err != nil {
@@ -26,6 +27,7 @@ func (client *Client) Account(id string) (account types.Account, err error) {
 	return
 }
 
+// Retrieve a User.
 func (client *Client) User(id string) (user types.User, err error) {
 	err = client.prepare()
 	if err != nil {
@@ -45,6 +47,7 @@ func (client *Client) User(id string) (user types.User, err error) {
 	return
 }
 
+// Retrieve a Group.
 func (client *Client) Group(id string) (group types.Group, err error) {
 	err = client.prepare()
 	if err != nil {
@@ -64,6 +67,7 @@ func (client *Client) Group(id string) (group types.Group, err error) {
 	return
 }
 
+// Retrieve a Case.
 func (client *Client) Case(id string) (_case types.Case, err error) {
 	err = client.prepare()
 	if err != nil {
@@ -83,6 +87,7 @@ func (client *Client) Case(id string) (_case types.Case, err error) {
 	return
 }
 
+// Retrieve a Contact.
 func (client *Client) Contact(id string) (contact types.Contact, err error) {
 	err = client.prepare()
 	if err != nil {

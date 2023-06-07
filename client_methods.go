@@ -7,6 +7,7 @@ import (
 	"github.com/stellaraf/go-sfdc/types"
 )
 
+// Retrieve the primary contact for an account.
 func (client *Client) AccountContact(accountId string) (contact types.Contact, err error) {
 	err = client.prepare()
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"github.com/stellaraf/go-sfdc/types"
 )
 
+// Salesforce Client
 type Client struct {
 	httpClient *resty.Client
 	auth       *_auth.Auth
@@ -20,6 +21,7 @@ func (client *Client) prepare() (err error) {
 	return
 }
 
+// Create a go-sfdc client and performs initial authentication.
 func NewClient(
 	clientID, privateKey, username, authURL string,
 	encryption *string,

@@ -12,7 +12,7 @@ func Test_OpenCases(t *testing.T) {
 		assert.NoError(t, err)
 		cases, err := client.OpenCases()
 		assert.NoError(t, err)
-		assert.True(t, len(cases.Records) > 0)
+		assert.True(t, len(cases) > 0)
 	})
 }
 
