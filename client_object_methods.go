@@ -1,3 +1,4 @@
+// Methods that handle objects.
 package sfdc
 
 import (
@@ -79,5 +80,24 @@ func (client *Client) Case(id string) (_case types.Case, err error) {
 		return
 	}
 	err = handleResponse(res, &_case)
+	return
+}
+
+func (client *Client) Contact(id string) (contact types.Contact, err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	basePath, err := getPath("contact")
+	if err != nil {
+		return
+	}
+	path := fmt.Sprintf("%s/%s", basePath, id)
+	req := client.httpClient.R()
+	res, err := req.Get(path)
+	if err != nil {
+		return
+	}
+	err = handleResponse(res, &contact)
 	return
 }

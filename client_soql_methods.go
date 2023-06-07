@@ -1,3 +1,4 @@
+// Methods that query SOQL.
 package sfdc
 
 import (
@@ -103,5 +104,19 @@ func (client *Client) AccountIDFromName(name string) (id string, err error) {
 		return
 	}
 	id = account.Records[0].ID
+	return
+}
+
+func (client *Client) Customers() (accounts []types.Customer, err error) {
+	sc := initSOQL[types.Customer](client)
+	q := SOQL().
+		Select("Id", "Name", "Type", "Service_Identifier__c").
+		From("Account").
+		Where("Type", "=", "Customer")
+	res, err := sc.Query(q)
+	if err != nil {
+		return
+	}
+	accounts = res.Records
 	return
 }

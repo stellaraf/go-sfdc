@@ -45,3 +45,13 @@ func Test_Case(t *testing.T) {
 		assert.Equal(t, env.TestData.CaseID, _case.ID)
 	})
 }
+
+func Test_Contact(t *testing.T) {
+	t.Run("get contact", func(t *testing.T) {
+		client, env, err := initClient()
+		assert.NoError(t, err)
+		contact, err := client.Contact(env.TestData.ContactID)
+		assert.NoError(t, err)
+		assert.Equal(t, env.TestData.ContactID, contact.ID)
+	})
+}

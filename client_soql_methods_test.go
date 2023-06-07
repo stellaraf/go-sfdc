@@ -51,3 +51,13 @@ func Test_AccountIDFromName(t *testing.T) {
 		assert.Equal(t, account.ID, id)
 	})
 }
+
+func Test_Customers(t *testing.T) {
+	t.Run("accounts with type customer", func(t *testing.T) {
+		client, _, err := initClient()
+		assert.NoError(t, err)
+		customers, err := client.Customers()
+		assert.NoError(t, err)
+		assert.True(t, len(customers) > 0)
+	})
+}
