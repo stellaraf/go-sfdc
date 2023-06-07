@@ -76,6 +76,7 @@ type User struct {
 
 type Group struct {
 	BaseObject
+	Name                   string `json:"Name"`
 	Developer_Name         string `json:"Developer_Name"`
 	RelatedID              string `json:"RelatedId,omitempty"`
 	QueueRoutingConfigID   string `json:"QueueRoutingConfigId,omitempty"`
