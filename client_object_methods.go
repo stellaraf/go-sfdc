@@ -8,7 +8,7 @@ import (
 )
 
 // Retrieve an Account.
-func (client *Client) Account(id string) (account types.Account, err error) {
+func (client *Client) Account(id string) (account *types.Account, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -68,7 +68,7 @@ func (client *Client) Group(id string) (group types.Group, err error) {
 }
 
 // Retrieve a Case.
-func (client *Client) Case(id string) (_case types.Case, err error) {
+func (client *Client) Case(id string) (_case *types.Case, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -88,7 +88,7 @@ func (client *Client) Case(id string) (_case types.Case, err error) {
 }
 
 // Retrieve a Contact.
-func (client *Client) Contact(id string) (contact types.Contact, err error) {
+func (client *Client) Contact(id string) (contact *types.Contact, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -107,6 +107,7 @@ func (client *Client) Contact(id string) (contact types.Contact, err error) {
 	return
 }
 
+// Update an account's fields.
 func (client *Client) UpdateAccount(id string, data interface{}) (err error) {
 	err = client.prepare()
 	if err != nil {
@@ -122,6 +123,7 @@ func (client *Client) UpdateAccount(id string, data interface{}) (err error) {
 	return
 }
 
+// Update a case's fields.
 func (client *Client) UpdateCase(id string, data *types.CaseUpdate) (err error) {
 	_, err = client.Case(id)
 	if err != nil {
@@ -141,6 +143,7 @@ func (client *Client) UpdateCase(id string, data *types.CaseUpdate) (err error) 
 	return
 }
 
+// Create a new case.
 func (client *Client) CreateCase(data *types.CaseCreate) (result *types.RecordCreatedResponse, err error) {
 	err = client.prepare()
 	if err != nil {
@@ -159,7 +162,7 @@ func (client *Client) CreateCase(data *types.CaseCreate) (result *types.RecordCr
 	if err != nil {
 		return
 	}
-	req := client.httpClient.R().SetBody(data).SetResult(&result)
+	req := client.httpClient.R().SetBody(data).SetResult(&types.RecordCreatedResponse{})
 	res, err := req.Post(basePath)
 	if err != nil {
 		return

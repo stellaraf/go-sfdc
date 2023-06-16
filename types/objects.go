@@ -153,16 +153,16 @@ type CaseUpdate struct {
 }
 
 type CaseCreate struct {
-	AccountID        string `json:"AccountId"`
-	Comments         string `json:"Comments"`
-	ContactID        string `json:"ContactId"`
-	Description      string `json:"Description"`
+	AccountID        string `json:"AccountId,omitempty"`
+	Comments         string `json:"Comments,omitempty"`
+	ContactID        string `json:"ContactId,omitempty"`
+	Description      string `json:"Description,omitempty"`
 	Origin           string `json:"Origin,omitempty"`
 	ServiceReason    string `json:"Service_Reason__c,omitempty"`
 	ServiceSubReason string `json:"Service_SubReason__c,omitempty"`
-	ServiceType      string `json:"Service_Type__c"`
-	Status           string `json:"Status"`
-	Subject          string `json:"Subject"`
+	ServiceType      string `json:"Service_Type__c,omitempty"`
+	Status           string `json:"Status,omitempty"`
+	Subject          string `json:"Subject,omitempty"`
 }
 
 type Case struct {

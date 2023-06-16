@@ -17,3 +17,7 @@ type ObjectSummary struct {
 	ID   string `json:"Id"`
 	Name string `json:"Name"`
 }
+
+type ObjectID struct {
+	ID string `json:"Id"`
+}
