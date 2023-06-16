@@ -1,6 +1,7 @@
 package sfdc
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stellaraf/go-sfdc/util"
@@ -17,7 +18,7 @@ func Test_SOQL(t *testing.T) {
 	t.Run("multiple where", func(t *testing.T) {
 		env, err := util.LoadEnv()
 		assert.NoError(t, err)
-		expected := "SELECT Id FROM Case WHERE IsClosed = false AND AccountId = '0013j00002ejudnAAA'"
+		expected := fmt.Sprintf("SELECT Id FROM Case WHERE IsClosed = false AND AccountId = '%s'", env.TestData.AccountID)
 		s, err := SOQL().Select("Id").From("Case").Where("IsClosed", "=", false).Where("AccountId", "=", env.TestData.AccountID).String()
 		assert.NoError(t, err)
 		assert.Equal(t, expected, s)
