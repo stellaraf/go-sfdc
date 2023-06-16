@@ -135,10 +135,34 @@ type Account struct {
 }
 
 type CaseSummary struct {
-	ID           string `json:"Id"`
-	OwnerID      string `json:"OwnerId"`
-	RMMSeriesUID string `json:"rmmSeriesUid__c"`
-	Status       string
+	ID      string `json:"Id"`
+	OwnerID string `json:"OwnerId"`
+	// RMMSeriesUID string `json:"rmmSeriesUid__c"`
+	Status string
+}
+
+type CaseUpdate struct {
+	Comments         string `json:"Comments,omitempty"`
+	Description      string `json:"Description,omitempty"`
+	ServiceReason    string `json:"Service_Reason__c"`
+	ServiceSubReason string `json:"Service_SubReason__c"`
+	ServiceType      string `json:"Service_Type__c"`
+	Status           string `json:"Status,omitempty"`
+	Subject          string `json:"Subject,omitempty"`
+	Type             string `json:"Type,omitempty"`
+}
+
+type CaseCreate struct {
+	AccountID        string `json:"AccountId"`
+	Comments         string `json:"Comments"`
+	ContactID        string `json:"ContactId"`
+	Description      string `json:"Description"`
+	Origin           string `json:"Origin,omitempty"`
+	ServiceReason    string `json:"Service_Reason__c,omitempty"`
+	ServiceSubReason string `json:"Service_SubReason__c,omitempty"`
+	ServiceType      string `json:"Service_Type__c"`
+	Status           string `json:"Status"`
+	Subject          string `json:"Subject"`
 }
 
 type Case struct {

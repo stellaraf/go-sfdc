@@ -106,3 +106,64 @@ func (client *Client) Contact(id string) (contact types.Contact, err error) {
 	err = handleResponse(res, &contact)
 	return
 }
+
+func (client *Client) UpdateAccount(id string, data interface{}) (err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	basePath, err := getPath("account")
+	if err != nil {
+		return
+	}
+	path := fmt.Sprintf("%s/%s", basePath, id)
+	req := client.httpClient.R().SetBody(data)
+	_, err = req.Patch(path)
+	return
+}
+
+func (client *Client) UpdateCase(id string, data *types.CaseUpdate) (err error) {
+	_, err = client.Case(id)
+	if err != nil {
+		return
+	}
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	basePath, err := getPath("case")
+	if err != nil {
+		return
+	}
+	path := fmt.Sprintf("%s/%s", basePath, id)
+	req := client.httpClient.R().SetBody(data)
+	_, err = req.Patch(path)
+	return
+}
+
+func (client *Client) CreateCase(data *types.CaseCreate) (result *types.RecordCreatedResponse, err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+
+	if data.ContactID == "" {
+		accountContact, err := client.AccountContact(data.AccountID)
+		if err != nil {
+			return nil, err
+		}
+		data.ContactID = accountContact.ID
+	}
+
+	basePath, err := getPath("case")
+	if err != nil {
+		return
+	}
+	req := client.httpClient.R().SetBody(data).SetResult(&result)
+	res, err := req.Post(basePath)
+	if err != nil {
+		return
+	}
+	result = res.Result().(*types.RecordCreatedResponse)
+	return
+}
