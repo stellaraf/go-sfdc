@@ -46,7 +46,13 @@ func (auth *Auth) GetNewToken() (token types.Token, err error) {
 	block, _ := pem.Decode([]byte(auth.privateKey))
 	rsaKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
-		return
+		rsaKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			rsaKey, err = x509.ParseECPrivateKey(block.Bytes)
+			if err != nil {
+				return
+			}
+		}
 	}
 	assertion, err := initialToken.SignedString(rsaKey)
 	if err != nil {
