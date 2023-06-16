@@ -64,6 +64,7 @@ func (s *soql) Where(key string, operator string, value interface{}) *soql {
 			values = append(values, fmt.Sprintf("'%v'", val))
 		}
 		valuesStr := fmt.Sprintf("(%s)", strings.Join(values, ", "))
+		valuesStr = util.EscapeString(valuesStr)
 		if op == "notin" {
 			_where = where{Key: k, Operator: "NOT IN", Value: valuesStr}
 		} else {
