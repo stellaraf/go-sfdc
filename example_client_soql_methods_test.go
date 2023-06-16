@@ -12,7 +12,7 @@ func ExampleClient_OpenCases() {
 	for _, openCase := range openCases {
 		fmt.Printf("Id=%s, Subject=%s, OwnerId=%s", openCase.ID, openCase.Subject, openCase.OwnerID)
 	}
-	// Output:
+	// Example Output:
 	// Id=003G000002z8VBQIA2, Subject=Case Subject, OwnerId=00QG00000234ZYXWVU
 }
 
@@ -22,7 +22,7 @@ func ExampleClient_UserName() {
 		// handle error
 	}
 	fmt.Println(name)
-	// Output: John Doe
+	// Example Output: John Doe
 }
 
 func ExampleClient_GroupName() {
@@ -31,7 +31,7 @@ func ExampleClient_GroupName() {
 		// handle error
 	}
 	fmt.Println(name)
-	// Output: Help Desk
+	// Example Output: Help Desk
 }
 
 func ExampleClient_AccountIDFromName() {
@@ -40,7 +40,7 @@ func ExampleClient_AccountIDFromName() {
 		// handle error
 	}
 	fmt.Println(id)
-	// Output: 001G00000456MNOPQR
+	// Example Output: 001G00000456MNOPQR
 }
 
 func ExampleClient_Customers() {
@@ -50,7 +50,7 @@ func ExampleClient_Customers() {
 	}
 	for _, customer := range customers {
 		fmt.Printf("Id=%s, Name=%s, Type=%s, ServiceIdentifier=%s", customer.ID, customer.Name, customer.Type, customer.ServiceIdentifier)
-		// Output: Id=00QG00000567DCBAZY, Name=Acme Corp, Type=Customer, ServiceIdentifier=0123456
+		// Example Output: Id=00QG00000567DCBAZY, Name=Acme Corp, Type=Customer, ServiceIdentifier=0123456
 		// ...
 	}
 }

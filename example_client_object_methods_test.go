@@ -15,7 +15,7 @@ func ExampleClient_Account() {
 		// handle error
 	}
 	fmt.Println(account.ID)
-	// Output: 006G00000678LKJIHE
+	// Example Output: 006G00000678LKJIHE
 }
 
 func ExampleClient_User() {
@@ -24,7 +24,7 @@ func ExampleClient_User() {
 		// handle error
 	}
 	fmt.Println(user.ID)
-	// Output: 003G00000789VUTSRQ
+	// Example Output: 003G00000789VUTSRQ
 }
 
 func ExampleClient_Group() {
@@ -33,7 +33,7 @@ func ExampleClient_Group() {
 		// handle error
 	}
 	fmt.Println(group.ID)
-	// Output: 00QG00000890ZYXWVU
+	// Example Output: 00QG00000890ZYXWVU
 }
 
 func ExampleClient_Case() {
@@ -42,7 +42,7 @@ func ExampleClient_Case() {
 		// handle error
 	}
 	fmt.Println(_case.ID)
-	// Output: 001G00000987KJIHGF
+	// Example Output: 001G00000987KJIHGF
 }
 
 func ExampleClient_Contact() {
@@ -51,5 +51,5 @@ func ExampleClient_Contact() {
 		// handle error
 	}
 	fmt.Println(contact.ID)
-	// Output: 003G00000123ZYXWVU
+	// Example Output: 003G00000123ZYXWVU
 }

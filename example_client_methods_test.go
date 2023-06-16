@@ -8,5 +8,5 @@ func ExampleClient_AccountContact() {
 		// handle error
 	}
 	fmt.Println(contact.ID)
-	// Output: 006G00000345ONMLKJ
+	// Example Output: 006G00000345ONMLKJ
 }
