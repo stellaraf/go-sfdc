@@ -211,6 +211,7 @@ type Case struct {
 	SuppliedPhone         string `json:"SuppliedPhone,omitempty"`
 	Type                  string `json:"Type,omitempty"`
 	RMMSeriesUID          string `json:"rmmSeriesUid__c,omitempty"`
+	AlertID               string `json:"Alert_ID__c"`
 }
 
 type FeedItem struct {
