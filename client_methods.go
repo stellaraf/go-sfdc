@@ -70,7 +70,7 @@ func (client *Client) CaseByNumber(caseNumber string) (result *types.Case, err e
 	if err != nil {
 		return
 	}
-	sc := initSOQL[types.ObjectID](client)
+	sc := NewSOQLClient[types.ObjectID](client)
 	queryResult, err := sc.Query(query)
 	if err != nil {
 		return

@@ -7,12 +7,12 @@ import (
 	"github.com/stellaraf/go-sfdc/types"
 )
 
-type soqlClient[T any] struct {
+type SOQLClient[T any] struct {
 	Client
 }
 
 // Query the Salesforce SOQL API with the created SOQL query.
-func (client *soqlClient[T]) Query(soqlQuery *soql) (results types.RecordResponse[T], err error) {
+func (client *SOQLClient[T]) Query(soqlQuery *soql) (results types.RecordResponse[T], err error) {
 	query, err := soqlQuery.String()
 	if err != nil {
 		return
@@ -35,14 +35,14 @@ func (client *soqlClient[T]) Query(soqlQuery *soql) (results types.RecordRespons
 	return
 }
 
-func initSOQL[T any](client *Client) (sc *soqlClient[T]) {
-	sc = &soqlClient[T]{*client}
+func NewSOQLClient[T any](client *Client) (sc *SOQLClient[T]) {
+	sc = &SOQLClient[T]{*client}
 	return
 }
 
 // Retrieve a summary of all open cases.
 func (client *Client) OpenCases() (cases []types.OpenCase, err error) {
-	sc := initSOQL[types.OpenCase](client)
+	sc := NewSOQLClient[types.OpenCase](client)
 	q := SOQL().
 		Select("Id", "Subject", "OwnerId").
 		From("Case").
@@ -58,7 +58,7 @@ func (client *Client) OpenCases() (cases []types.OpenCase, err error) {
 
 // Retrieve the name of a user based on that user's ID.
 func (client *Client) UserName(id string) (name string, err error) {
-	sc := initSOQL[types.User](client)
+	sc := NewSOQLClient[types.User](client)
 	q := SOQL().
 		Select("Id", "Name").
 		From("User").
@@ -78,7 +78,7 @@ func (client *Client) UserName(id string) (name string, err error) {
 
 // Retrieve the name of a group based on the group's ID.
 func (client *Client) GroupName(id string) (name string, err error) {
-	sc := initSOQL[types.ObjectSummary](client)
+	sc := NewSOQLClient[types.ObjectSummary](client)
 	q := SOQL().
 		Select("Id", "Name").
 		From("Group").
@@ -98,7 +98,7 @@ func (client *Client) GroupName(id string) (name string, err error) {
 
 // Find an account's ID based on the account's name.
 func (client *Client) AccountIDFromName(name string) (id string, err error) {
-	sc := initSOQL[types.Account](client)
+	sc := NewSOQLClient[types.Account](client)
 	q := SOQL().
 		Select("Id", "Name").
 		From("Account").
@@ -118,7 +118,7 @@ func (client *Client) AccountIDFromName(name string) (id string, err error) {
 
 // Retrieve a summary of all accounts where the 'Type' field is 'Customer'.
 func (client *Client) Customers() (accounts []types.Customer, err error) {
-	sc := initSOQL[types.Customer](client)
+	sc := NewSOQLClient[types.Customer](client)
 	q := SOQL().
 		Select("Id", "Name", "Type", "Service_Identifier__c").
 		From("Account").
