@@ -31,6 +31,24 @@ type Auth struct {
 	setRefreshTokenCallback types.SetTokenCallback
 }
 
+func parsePrivateKey(key []byte) (parsed any, err error) {
+	parsed, err = x509.ParsePKCS8PrivateKey(key)
+	if err != nil {
+		parsed, err = x509.ParsePKCS1PrivateKey(key)
+		if err != nil {
+			parsed, err = x509.ParseECPrivateKey(key)
+			if err != nil {
+				return
+			}
+		}
+	}
+	if parsed == nil {
+		err = fmt.Errorf("failed to parse private key")
+		return
+	}
+	return
+}
+
 func (auth *Auth) GetNewToken() (token types.Token, err error) {
 	expiresAt := time.Now()
 	expiresAt = expiresAt.Add(time.Second * 300)
@@ -44,15 +62,13 @@ func (auth *Auth) GetNewToken() (token types.Token, err error) {
 	}
 	initialToken := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	block, _ := pem.Decode([]byte(auth.privateKey))
-	rsaKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if block == nil {
+		err = fmt.Errorf("failed to decode private key")
+		return
+	}
+	rsaKey, err := parsePrivateKey(block.Bytes)
 	if err != nil {
-		rsaKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
-		if err != nil {
-			rsaKey, err = x509.ParseECPrivateKey(block.Bytes)
-			if err != nil {
-				return
-			}
-		}
+		return
 	}
 	assertion, err := initialToken.SignedString(rsaKey)
 	if err != nil {
