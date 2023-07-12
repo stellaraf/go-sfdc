@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/stellaraf/go-sfdc/types"
+	"github.com/stellaraf/go-sfdc/util"
 )
 
 // Retrieve an Account.
@@ -144,7 +145,7 @@ func (client *Client) UpdateCase(id string, data *types.CaseUpdate) (err error) 
 }
 
 // Create a new case.
-func (client *Client) CreateCase(data *types.CaseCreate) (result *types.RecordCreatedResponse, err error) {
+func (client *Client) CreateCase(data *types.CaseCreate, extra ...map[string]any) (result *types.RecordCreatedResponse, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -162,7 +163,15 @@ func (client *Client) CreateCase(data *types.CaseCreate) (result *types.RecordCr
 	if err != nil {
 		return
 	}
-	req := client.httpClient.R().SetBody(data).SetResult(&types.RecordCreatedResponse{})
+	firstExtra := map[string]any{}
+	if len(extra) != 0 {
+		firstExtra = extra[0]
+	}
+	body, err := util.MergeStructToMap(data, firstExtra)
+	if err != nil {
+		return
+	}
+	req := client.httpClient.R().SetBody(body).SetResult(&types.RecordCreatedResponse{})
 	res, err := req.Post(basePath)
 	if err != nil {
 		return

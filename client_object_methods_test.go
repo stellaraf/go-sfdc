@@ -80,4 +80,28 @@ func Test_CreateCase(t *testing.T) {
 		err = client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
 		assert.NoError(t, err)
 	})
+
+	t.Run("create and cancel case with extra fields", func(t *testing.T) {
+		client, env, err := initClient()
+		assert.NoError(t, err)
+		now := time.Now()
+		subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
+		caseData := &types.CaseCreate{
+			AccountID:   env.TestData.AccountID,
+			Comments:    "go-sfdc unit test case",
+			ContactID:   env.TestData.ContactID,
+			Description: subject,
+			Origin:      "Web",
+			Status:      "New",
+			Subject:     subject,
+		}
+		extraData := map[string]any{
+			"rmmSeriesUid__c": "12345",
+		}
+		result, err := client.CreateCase(caseData, extraData)
+		assert.NoError(t, err)
+		assert.True(t, result.Success)
+		err = client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
+		assert.NoError(t, err)
+	})
 }

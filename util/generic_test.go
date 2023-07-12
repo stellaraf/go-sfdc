@@ -67,3 +67,25 @@ func Test_IsTime(t *testing.T) {
 		assert.False(t, result)
 	})
 }
+
+func Test_MergeStructToMap(t *testing.T) {
+	t.Run("merge struct with map", func(t *testing.T) {
+		keys := []string{"a", "b", "c", "d"}
+		type S struct {
+			A string `json:"a"`
+			B string `json:"b"`
+		}
+		s := &S{
+			A: "a",
+			B: "b",
+		}
+		m := map[string]any{"c": "c", "d": "d"}
+		result, err := util.MergeStructToMap(s, m)
+		assert.NoError(t, err)
+		assert.IsType(t, map[string]any{}, result)
+		for _, k := range keys {
+			v := result[k]
+			assert.Equal(t, k, v)
+		}
+	})
+}
