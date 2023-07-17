@@ -179,3 +179,21 @@ func (client *Client) CreateCase(data *types.CaseCreate, extra ...map[string]any
 	result = res.Result().(*types.RecordCreatedResponse)
 	return
 }
+
+func (client *Client) FeedItem(id string) (result *types.FeedItem, err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	basePath, err := getPath("feed_item")
+	if err != nil {
+		return
+	}
+	req := client.httpClient.R().SetResult(&types.FeedItem{})
+	res, err := req.Get(fmt.Sprintf("%s/%s", basePath, id))
+	if err != nil {
+		return
+	}
+	result = res.Result().(*types.FeedItem)
+	return
+}

@@ -36,7 +36,7 @@ func (client *Client) CloseCase(caseID string) (err error) {
 }
 
 // Post a comment to a case.
-func (client *Client) PostToCase(caseID string, content string, feedOptions *types.FeedItem) (result *types.RecordCreatedResponse, err error) {
+func (client *Client) PostToCase(caseID string, content string, feedOptions *types.FeedItemOptions) (result *types.RecordCreatedResponse, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -46,7 +46,7 @@ func (client *Client) PostToCase(caseID string, content string, feedOptions *typ
 		return
 	}
 	if feedOptions == nil {
-		feedOptions = &types.FeedItem{}
+		feedOptions = &types.FeedItemOptions{}
 	}
 	feedOptions.ParentID = caseID
 	feedOptions.Body = content

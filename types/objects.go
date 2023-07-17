@@ -144,9 +144,9 @@ type CaseSummary struct {
 type CaseUpdate struct {
 	Comments         string `json:"Comments,omitempty"`
 	Description      string `json:"Description,omitempty"`
-	ServiceReason    string `json:"Service_Reason__c"`
-	ServiceSubReason string `json:"Service_SubReason__c"`
-	ServiceType      string `json:"Service_Type__c"`
+	ServiceReason    string `json:"Service_Reason__c,omitempty"`
+	ServiceSubReason string `json:"Service_SubReason__c,omitempty"`
+	ServiceType      string `json:"Service_Type__c,omitempty"`
 	Status           string `json:"Status,omitempty"`
 	Subject          string `json:"Subject,omitempty"`
 	Type             string `json:"Type,omitempty"`
@@ -214,13 +214,13 @@ type Case struct {
 	AlertID               string `json:"Alert_ID__c"`
 }
 
-type FeedItem struct {
+type FeedItemOptions struct {
 	// ID of whatever this is attached to (most likely, the case ID).
-	ParentID string `json:"ParentId"`
+	ParentID string `json:"ParentId,omitempty"`
 	// Body - required if Type is TextPost.
-	Body string `json:"Body"`
+	Body string `json:"Body,omitempty"`
 	// Temporarily only supporting "TextPost".
-	Type string `json:"Type"`
+	Type string `json:"Type,omitempty"`
 	/* If true, these HTML tags are supported:
 	<p/>
 	<a/>
@@ -246,4 +246,37 @@ type FeedItem struct {
 	   The Update property is supported only for feed items posted on records.
 	*/
 	Visibility string `json:"Visibility,omitempty"`
+}
+
+type FeedItem struct {
+	Attributes         Attributes `json:"attributes"`
+	ID                 string     `json:"Id"`
+	ParentID           string     `json:"ParentId"`
+	Type               string     `json:"Type"`
+	CreatedByID        string     `json:"CreatedById"`
+	CreatedDate        string     `json:"CreatedDate"`
+	IsDeleted          bool       `json:"IsDeleted"`
+	LastModifiedDate   string     `json:"LastModifiedDate"`
+	SystemModstamp     string     `json:"SystemModstamp"`
+	Revision           int        `json:"Revision"`
+	LastEditByID       string     `json:"LastEditById,omitempty"`
+	LastEditDate       string     `json:"LastEditDate,omitempty"`
+	ConnectionID       string     `json:"ConnectionId,omitempty"`
+	CommentCount       int        `json:"CommentCount"`
+	LikeCount          int        `json:"LikeCount"`
+	Title              string     `json:"Title,omitempty"`
+	Body               string     `json:"Body"`
+	LinkURL            string     `json:"LinkUrl,omitempty"`
+	IsRichText         bool       `json:"IsRichText"`
+	RelatedRecordID    string     `json:"RelatedRecordId,omitempty"`
+	InsertedByID       string     `json:"InsertedById"`
+	NetworkScope       string     `json:"NetworkScope"`
+	Visibility         string     `json:"Visibility"`
+	BestCommentID      string     `json:"BestCommentId,omitempty"`
+	HasContent         bool       `json:"HasContent"`
+	HasLink            bool       `json:"HasLink"`
+	HasFeedEntity      bool       `json:"HasFeedEntity"`
+	HasVerifiedComment bool       `json:"HasVerifiedComment"`
+	IsClosed           bool       `json:"IsClosed"`
+	Status             string     `json:"Status"`
 }

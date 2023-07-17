@@ -20,27 +20,44 @@ func Test_AccountContact(t *testing.T) {
 }
 
 func Test_PostToCase(t *testing.T) {
-	t.Run("create a case and post an update", func(t *testing.T) {
-		client, env, err := initClient()
+	client, env, _ := initClient()
+	now := time.Now()
+	subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
+	caseData := &types.CaseCreate{
+		AccountID:   env.TestData.AccountID,
+		Comments:    "go-sfdc unit test case",
+		ContactID:   env.TestData.ContactID,
+		Description: subject,
+		Origin:      "Web",
+		Status:      "New",
+		Subject:     subject,
+	}
+	newCase, _ := client.CreateCase(caseData)
+	t.Run("post plain text update", func(t *testing.T) {
+		postResult, err := client.PostToCase(newCase.ID, "go-sfdc test plain text comment", nil)
 		assert.NoError(t, err)
-		now := time.Now()
-		subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
-		caseData := &types.CaseCreate{
-			AccountID:   env.TestData.AccountID,
-			Comments:    "go-sfdc unit test case",
-			ContactID:   env.TestData.ContactID,
-			Description: subject,
-			Origin:      "Web",
-			Status:      "New",
-			Subject:     subject,
-		}
-		newCase, err := client.CreateCase(caseData)
-		assert.NoError(t, err)
-		postResult, err := client.PostToCase(newCase.ID, "go-sfdc test comment", nil)
+		feedItem, err := client.FeedItem(postResult.ID)
 		assert.NoError(t, err)
 		assert.True(t, postResult.Success)
-		err = client.UpdateCase(newCase.ID, &types.CaseUpdate{Status: "Canceled"})
+		assert.Equal(t, postResult.ID, feedItem.ID)
+		assert.Greater(t, len(postResult.ID), 1)
+	})
+	t.Run("post html update", func(t *testing.T) {
+		body := "<b>go-sfdc test HTML comment</b>"
+		postResult, err := client.PostToCase(newCase.ID, body, &types.FeedItemOptions{
+			IsRichText: true,
+		})
 		assert.NoError(t, err)
+		feedItem, err := client.FeedItem(postResult.ID)
+		assert.NoError(t, err)
+		assert.True(t, postResult.Success)
+		assert.Equal(t, postResult.ID, feedItem.ID)
+		assert.Greater(t, len(postResult.ID), 1)
+		assert.True(t, feedItem.IsRichText)
+		assert.Equal(t, body, feedItem.Body)
+	})
+	t.Cleanup(func() {
+		client.UpdateCase(newCase.ID, &types.CaseUpdate{Status: "Canceled"})
 	})
 }
 
