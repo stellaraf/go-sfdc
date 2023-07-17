@@ -23,4 +23,10 @@ func Test_SOQL(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expected, s)
 	})
+	t.Run("where contains", func(t *testing.T) {
+		expected := `SELECT Id FROM Case WHERE Description LIKE \'%a%\'`
+		s, err := SOQL().Select("Id").From("Case").Where("Description", "contains", "a").String()
+		assert.NoError(t, err)
+		assert.Equal(t, expected, s)
+	})
 }

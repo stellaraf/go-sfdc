@@ -132,7 +132,7 @@ func (s *soql) String() (result string, err error) {
 	if len(s._where) > 0 {
 		var filters []string
 		for _, w := range s._where {
-			statement := fmt.Sprintf("%s %s %s", w.Key, w.Operator, w.Value)
+			statement := strings.Join([]string{w.Key, w.Operator, w.Value}, " ")
 			filters = append(filters, statement)
 		}
 		_where := fmt.Sprintf("WHERE %s", strings.Join(filters, " AND "))
