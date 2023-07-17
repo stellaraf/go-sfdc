@@ -74,7 +74,6 @@ func (s *soql) Where(key string, operator string, value interface{}) *soql {
 		switch operator {
 		case "contains":
 			val := fmt.Sprintf("'%%%v%%'", value)
-			val = util.EscapeString(val)
 			_where = where{Key: key, Operator: "LIKE", Value: val}
 		case "startswith":
 			val := fmt.Sprintf("'%v%%'", value)
