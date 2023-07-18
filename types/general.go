@@ -1,11 +1,5 @@
 package types
 
-// type Options struct {
-// 	User string `json:"string"`
-// 	Scope string `json:"scope"`
-// 	BaseURL string `json:"scope"`
-// }
-
 type StringOrInt interface {
 	string | int
 }
