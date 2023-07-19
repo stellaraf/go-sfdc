@@ -1,4 +1,4 @@
-package sfdc
+package sfdc_test
 
 import (
 	"fmt"
@@ -11,32 +11,29 @@ import (
 
 func Test_AccountContact(t *testing.T) {
 	t.Run("account contact", func(t *testing.T) {
-		client, env, err := initClient()
+		contact, err := Client.AccountContact(Env.TestData.AccountID)
 		assert.NoError(t, err)
-		contact, err := client.AccountContact(env.TestData.AccountID)
-		assert.NoError(t, err)
-		assert.Equal(t, env.TestData.ContactID, contact.ID)
+		assert.Equal(t, Env.TestData.ContactID, contact.ID)
 	})
 }
 
 func Test_PostToCase(t *testing.T) {
-	client, env, _ := initClient()
 	now := time.Now()
 	subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
 	caseData := &types.CaseCreate{
-		AccountID:   env.TestData.AccountID,
+		AccountID:   Env.TestData.AccountID,
 		Comments:    "go-sfdc unit test case",
-		ContactID:   env.TestData.ContactID,
+		ContactID:   Env.TestData.ContactID,
 		Description: subject,
 		Origin:      "Web",
 		Status:      "New",
 		Subject:     subject,
 	}
-	newCase, _ := client.CreateCase(caseData)
+	newCase, _ := Client.CreateCase(caseData)
 	t.Run("post plain text update", func(t *testing.T) {
-		postResult, err := client.PostToCase(newCase.ID, "go-sfdc test plain text comment", nil)
+		postResult, err := Client.PostToCase(newCase.ID, "go-sfdc test plain text comment", nil)
 		assert.NoError(t, err)
-		feedItem, err := client.FeedItem(postResult.ID)
+		feedItem, err := Client.FeedItem(postResult.ID)
 		assert.NoError(t, err)
 		assert.True(t, postResult.Success)
 		assert.Equal(t, postResult.ID, feedItem.ID)
@@ -44,11 +41,11 @@ func Test_PostToCase(t *testing.T) {
 	})
 	t.Run("post html update", func(t *testing.T) {
 		body := "<b>go-sfdc test HTML comment</b>"
-		postResult, err := client.PostToCase(newCase.ID, body, &types.FeedItemOptions{
+		postResult, err := Client.PostToCase(newCase.ID, body, &types.FeedItemOptions{
 			IsRichText: true,
 		})
 		assert.NoError(t, err)
-		feedItem, err := client.FeedItem(postResult.ID)
+		feedItem, err := Client.FeedItem(postResult.ID)
 		assert.NoError(t, err)
 		assert.True(t, postResult.Success)
 		assert.Equal(t, postResult.ID, feedItem.ID)
@@ -57,30 +54,28 @@ func Test_PostToCase(t *testing.T) {
 		assert.Equal(t, body, feedItem.Body)
 	})
 	t.Cleanup(func() {
-		client.UpdateCase(newCase.ID, &types.CaseUpdate{Status: "Canceled"})
+		Client.UpdateCase(newCase.ID, &types.CaseUpdate{Status: "Canceled"})
 	})
 }
 
 func Test_CloseCase(t *testing.T) {
 	t.Run("create a case and close it", func(t *testing.T) {
-		client, env, err := initClient()
-		assert.NoError(t, err)
 		now := time.Now()
 		subject := fmt.Sprintf("go-sfdc Test_CloseCase case %s", now.Format(time.RFC3339))
 		caseData := &types.CaseCreate{
-			AccountID:   env.TestData.AccountID,
+			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
-			ContactID:   env.TestData.ContactID,
+			ContactID:   Env.TestData.ContactID,
 			Description: subject,
 			Origin:      "Web",
 			Status:      "New",
 			Subject:     subject,
 		}
-		newCase, err := client.CreateCase(caseData)
+		newCase, err := Client.CreateCase(caseData)
 		assert.NoError(t, err)
-		err = client.CloseCase(newCase.ID)
+		err = Client.CloseCase(newCase.ID)
 		assert.NoError(t, err)
-		closedCase, err := client.Case(newCase.ID)
+		closedCase, err := Client.Case(newCase.ID)
 		assert.NoError(t, err)
 		assert.Equal(t, "Closed", closedCase.Status)
 	})
@@ -88,28 +83,26 @@ func Test_CloseCase(t *testing.T) {
 
 func Test_CaseByNumber(t *testing.T) {
 	t.Run("get a case by its case number", func(t *testing.T) {
-		client, env, err := initClient()
-		assert.NoError(t, err)
 		now := time.Now()
 		subject := fmt.Sprintf("go-sfdc Test_CaseByNumber case %s", now.Format(time.RFC3339))
 		caseData := &types.CaseCreate{
-			AccountID:   env.TestData.AccountID,
+			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
-			ContactID:   env.TestData.ContactID,
+			ContactID:   Env.TestData.ContactID,
 			Description: subject,
 			Origin:      "Web",
 			Status:      "New",
 			Subject:     subject,
 		}
-		res, err := client.CreateCase(caseData)
+		res, err := Client.CreateCase(caseData)
 		assert.NoError(t, err)
 		assert.True(t, res.Success)
-		newCase, err := client.Case(res.ID)
+		newCase, err := Client.Case(res.ID)
 		assert.NoError(t, err)
-		caseByNumber, err := client.CaseByNumber(newCase.CaseNumber)
+		caseByNumber, err := Client.CaseByNumber(newCase.CaseNumber)
 		assert.NoError(t, err)
 		assert.Equal(t, newCase.CaseNumber, caseByNumber.CaseNumber)
-		err = client.UpdateCase(res.ID, &types.CaseUpdate{Status: "Canceled"})
+		err = Client.UpdateCase(res.ID, &types.CaseUpdate{Status: "Canceled"})
 		assert.NoError(t, err)
 	})
 }

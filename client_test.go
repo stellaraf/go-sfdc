@@ -1,12 +1,16 @@
-package sfdc
+package sfdc_test
 
 import (
 	"time"
 
 	"github.com/muesli/cache2go"
+	"github.com/stellaraf/go-sfdc"
 	"github.com/stellaraf/go-sfdc/types"
 	"github.com/stellaraf/go-sfdc/util"
 )
+
+var Client *sfdc.Client
+var Env types.Environment
 
 func setup() (
 	getAccessTokenCallback types.CachedTokenCallback,
@@ -44,7 +48,7 @@ func setup() (
 	return getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, nil
 }
 
-func initClient() (client *Client, env types.Environment, err error) {
+func initClient() (client *sfdc.Client, env types.Environment, err error) {
 	env, err = util.LoadEnv()
 	if err != nil {
 		return
@@ -57,10 +61,19 @@ func initClient() (client *Client, env types.Environment, err error) {
 	if env.EncryptionPassphrase != "" {
 		encryptionPassphrase = &env.EncryptionPassphrase
 	}
-	client, err = NewClient(
+	client, err = sfdc.NewClient(
 		env.ClientID, env.PrivateKey, env.AuthUsername, env.AuthURL,
 		encryptionPassphrase,
 		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken,
 	)
 	return
+}
+
+func init() {
+	client, env, err := initClient()
+	if err != nil {
+		panic(err)
+	}
+	Client = client
+	Env = env
 }

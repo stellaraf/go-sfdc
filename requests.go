@@ -1,10 +1,11 @@
 package sfdc
 
 import (
-	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/perimeterx/marshmallow"
 	"github.com/stellaraf/go-sfdc/util"
 )
 
@@ -42,12 +43,23 @@ func getPath(pathName string) (path string, err error) {
 	return
 }
 
-func handleResponse(res *resty.Response, data any) (err error) {
+func handleResponse(res *resty.Response, obj any) (err error) {
 	err = util.CheckForError(res)
 	if err != nil {
 		return
 	}
+	p := reflect.ValueOf(obj)
+	if p.Kind() != reflect.Pointer {
+		err = fmt.Errorf("expected pointer type")
+		return
+	}
+	s := p.Elem()
 	body := res.Body()
-	err = json.Unmarshal(body, data)
+	extra, err := marshmallow.Unmarshal(body, obj)
+	f := s.FieldByName("CustomFields")
+	e := reflect.ValueOf(extra)
+	if f.CanSet() {
+		f.Set(e)
+	}
 	return
 }

@@ -1,4 +1,4 @@
-package sfdc
+package sfdc_test
 
 import (
 	"fmt"
@@ -11,85 +11,77 @@ import (
 
 func Test_Account(t *testing.T) {
 	t.Run("get account", func(t *testing.T) {
-		client, env, err := initClient()
+		account, err := Client.Account(Env.TestData.AccountID)
 		assert.NoError(t, err)
-		account, err := client.Account(env.TestData.AccountID)
+		assert.Equal(t, Env.TestData.AccountID, account.ID)
+	})
+	t.Run("get account custom field", func(t *testing.T) {
+		account, err := Client.Account(Env.TestData.AccountID)
 		assert.NoError(t, err)
-		assert.Equal(t, env.TestData.AccountID, account.ID)
+		cfvalue := account.CustomFields[Env.TestData.AccountCustomFieldKey]
+		assert.NotEmpty(t, cfvalue)
 	})
 }
 
 func Test_User(t *testing.T) {
 	t.Run("get user", func(t *testing.T) {
-		client, env, err := initClient()
+		user, err := Client.User(Env.TestData.UserID)
 		assert.NoError(t, err)
-		user, err := client.User(env.TestData.UserID)
-		assert.NoError(t, err)
-		assert.Equal(t, env.TestData.UserID, user.ID)
+		assert.Equal(t, Env.TestData.UserID, user.ID)
 	})
 }
 
 func Test_Group(t *testing.T) {
 	t.Run("get group", func(t *testing.T) {
-		client, env, err := initClient()
+		group, err := Client.Group(Env.TestData.GroupID)
 		assert.NoError(t, err)
-		group, err := client.Group(env.TestData.GroupID)
-		assert.NoError(t, err)
-		assert.Equal(t, env.TestData.GroupID, group.ID)
+		assert.Equal(t, Env.TestData.GroupID, group.ID)
 	})
 }
 
 func Test_Case(t *testing.T) {
 	t.Run("get case", func(t *testing.T) {
-		client, env, err := initClient()
+		_case, err := Client.Case(Env.TestData.CaseID)
 		assert.NoError(t, err)
-		_case, err := client.Case(env.TestData.CaseID)
-		assert.NoError(t, err)
-		assert.Equal(t, env.TestData.CaseID, _case.ID)
+		assert.Equal(t, Env.TestData.CaseID, _case.ID)
 	})
 }
 
 func Test_Contact(t *testing.T) {
 	t.Run("get contact", func(t *testing.T) {
-		client, env, err := initClient()
+		contact, err := Client.Contact(Env.TestData.ContactID)
 		assert.NoError(t, err)
-		contact, err := client.Contact(env.TestData.ContactID)
-		assert.NoError(t, err)
-		assert.Equal(t, env.TestData.ContactID, contact.ID)
+		assert.Equal(t, Env.TestData.ContactID, contact.ID)
 	})
 }
 
 func Test_CreateCase(t *testing.T) {
 	t.Run("create and cancel case", func(t *testing.T) {
-		client, env, err := initClient()
-		assert.NoError(t, err)
 		now := time.Now()
 		subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
 		caseData := &types.CaseCreate{
-			AccountID:   env.TestData.AccountID,
+			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
-			ContactID:   env.TestData.ContactID,
+			ContactID:   Env.TestData.ContactID,
 			Description: subject,
 			Origin:      "Web",
 			Status:      "New",
 			Subject:     subject,
 		}
-		result, err := client.CreateCase(caseData)
+		result, err := Client.CreateCase(caseData)
 		assert.NoError(t, err)
 		assert.True(t, result.Success)
-		err = client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
+		err = Client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
 		assert.NoError(t, err)
 	})
 
 	t.Run("create and cancel case with extra fields", func(t *testing.T) {
-		client, env, err := initClient()
-		assert.NoError(t, err)
 		now := time.Now()
 		subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
 		caseData := &types.CaseCreate{
-			AccountID:   env.TestData.AccountID,
+			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
-			ContactID:   env.TestData.ContactID,
+			ContactID:   Env.TestData.ContactID,
 			Description: subject,
 			Origin:      "Web",
 			Status:      "New",
@@ -98,10 +90,10 @@ func Test_CreateCase(t *testing.T) {
 		extraData := map[string]any{
 			"rmmSeriesUid__c": "12345",
 		}
-		result, err := client.CreateCase(caseData, extraData)
+		result, err := Client.CreateCase(caseData, extraData)
 		assert.NoError(t, err)
 		assert.True(t, result.Success)
-		err = client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
+		err = Client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
 		assert.NoError(t, err)
 	})
 }

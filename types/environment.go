@@ -1,12 +1,13 @@
 package types
 
 type TestData struct {
-	AccountID   string `json:"accountId"`
-	UserID      string `json:"userId"`
-	GroupID     string `json:"groupId"`
-	CaseID      string `json:"caseId"`
-	AccountName string `json:"accountName"`
-	ContactID   string `json:"contactId"`
+	AccountID             string `json:"accountId"`
+	UserID                string `json:"userId"`
+	GroupID               string `json:"groupId"`
+	CaseID                string `json:"caseId"`
+	AccountName           string `json:"accountName"`
+	ContactID             string `json:"contactId"`
+	AccountCustomFieldKey string `json:"accountCustomFieldKey"`
 }
 
 type Environment struct {

@@ -24,12 +24,13 @@ func (client *Client) Account(id string) (account *types.Account, err error) {
 	if err != nil {
 		return
 	}
-	err = handleResponse(res, &account)
+	account = &types.Account{}
+	err = handleResponse(res, account)
 	return
 }
 
 // Retrieve a User.
-func (client *Client) User(id string) (user types.User, err error) {
+func (client *Client) User(id string) (user *types.User, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -44,12 +45,13 @@ func (client *Client) User(id string) (user types.User, err error) {
 	if err != nil {
 		return
 	}
-	err = handleResponse(res, &user)
+	user = &types.User{}
+	err = handleResponse(res, user)
 	return
 }
 
 // Retrieve a Group.
-func (client *Client) Group(id string) (group types.Group, err error) {
+func (client *Client) Group(id string) (group *types.Group, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -64,7 +66,8 @@ func (client *Client) Group(id string) (group types.Group, err error) {
 	if err != nil {
 		return
 	}
-	err = handleResponse(res, &group)
+	group = &types.Group{}
+	err = handleResponse(res, group)
 	return
 }
 
@@ -84,7 +87,8 @@ func (client *Client) Case(id string) (_case *types.Case, err error) {
 	if err != nil {
 		return
 	}
-	err = handleResponse(res, &_case)
+	_case = &types.Case{}
+	err = handleResponse(res, _case)
 	return
 }
 
@@ -104,7 +108,8 @@ func (client *Client) Contact(id string) (contact *types.Contact, err error) {
 	if err != nil {
 		return
 	}
-	err = handleResponse(res, &contact)
+	contact = &types.Contact{}
+	err = handleResponse(res, contact)
 	return
 }
 
