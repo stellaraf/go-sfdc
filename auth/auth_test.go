@@ -81,4 +81,23 @@ func Test_Auth(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEqual(t, "", token.AccessToken)
 	})
+
+	t.Run("test auth errors", func(t *testing.T) {
+		env, err := util.LoadEnv()
+		assert.NoError(t, err)
+		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setup()
+		assert.NoError(t, err)
+		_, err = NewAuth(
+			"invalid-client-key",
+			env.PrivateKey,
+			env.AuthUsername,
+			env.AuthURL,
+			nil,
+			getAccessToken,
+			setAccessToken,
+			getRefreshToken,
+			setRefreshToken,
+		)
+		assert.ErrorContains(t, err, "client identifier invalid")
+	})
 }

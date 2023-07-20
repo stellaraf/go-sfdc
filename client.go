@@ -4,6 +4,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	_auth "github.com/stellaraf/go-sfdc/auth"
 	"github.com/stellaraf/go-sfdc/types"
+	"github.com/stellaraf/go-sfdc/util"
 )
 
 // Salesforce Client
@@ -18,6 +19,29 @@ func (client *Client) prepare() (err error) {
 		return
 	}
 	client.httpClient.SetAuthToken(token)
+	return
+}
+
+func (client *Client) mergeCustomFields(obj any, fields []types.CustomFields) (merged map[string]any, err error) {
+	size := 0
+	for _, m := range fields {
+		size += len(m)
+	}
+	allFields := make(map[string]any, size)
+	for _, m := range fields {
+		for k, v := range m {
+			allFields[k] = v
+		}
+	}
+	merged, err = util.MergeStructToMap(obj, allFields)
+	return
+}
+
+func (client *Client) handleObjectError(res *resty.Response) (err error) {
+	if res.IsError() {
+		e := res.Error().(*types.SalesforceErrorResponse)
+		return util.GetSFDCError(e)
+	}
 	return
 }
 

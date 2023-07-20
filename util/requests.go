@@ -71,12 +71,34 @@ func CheckForError(response *resty.Response) (err error) {
 	return
 }
 
-func GetSFDCError(data any) string {
-	if types.IsServerError(data) {
-		return data.(types.ServerErrorResponse).Message
+func GetSFDCError(data any) error {
+	e, ok := data.(types.SalesforceErrorResponse)
+	if ok {
+		return e.GetError()
 	}
-	if types.IsQueryError(data) {
-		return data.(types.GenericResponse).Message
+	ep, ok := data.(*types.SalesforceErrorResponse)
+	if ok && ep != nil {
+		return ep.GetError()
 	}
-	return fmt.Sprintf("%s", data)
+	g, ok := data.(types.GenericResponse)
+	if ok {
+		return fmt.Errorf("Error: %s", g.Message)
+	}
+	gp, ok := data.(*types.GenericResponse)
+	if ok && gp != nil {
+		return fmt.Errorf("Error: %s", gp.Message)
+	}
+	a, ok := data.(types.AuthErrorResponse)
+	if ok {
+		return a.GetError()
+	}
+	ap, ok := data.(*types.AuthErrorResponse)
+	if ok && ap != nil {
+		return ap.GetError()
+	}
+	return fmt.Errorf("Unknown Error: %v", data)
+}
+
+func GetSFDCErrorString(data any) string {
+	return GetSFDCError(data).Error()
 }

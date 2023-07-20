@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/stellaraf/go-sfdc/types"
-	"github.com/stellaraf/go-sfdc/util"
 )
 
 // Retrieve an Account.
@@ -21,6 +20,10 @@ func (client *Client) Account(id string) (account *types.Account, err error) {
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
 	res, err := req.Get(path)
+	if err != nil {
+		return
+	}
+	err = client.handleObjectError(res)
 	if err != nil {
 		return
 	}
@@ -45,6 +48,10 @@ func (client *Client) User(id string) (user *types.User, err error) {
 	if err != nil {
 		return
 	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return
+	}
 	user = &types.User{}
 	err = handleResponse(res, user)
 	return
@@ -63,6 +70,10 @@ func (client *Client) Group(id string) (group *types.Group, err error) {
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
 	res, err := req.Get(path)
+	if err != nil {
+		return
+	}
+	err = client.handleObjectError(res)
 	if err != nil {
 		return
 	}
@@ -87,6 +98,10 @@ func (client *Client) Case(id string) (_case *types.Case, err error) {
 	if err != nil {
 		return
 	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return
+	}
 	_case = &types.Case{}
 	err = handleResponse(res, _case)
 	return
@@ -108,13 +123,17 @@ func (client *Client) Contact(id string) (contact *types.Contact, err error) {
 	if err != nil {
 		return
 	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return
+	}
 	contact = &types.Contact{}
 	err = handleResponse(res, contact)
 	return
 }
 
 // Update an account's fields.
-func (client *Client) UpdateAccount(id string, data interface{}) (err error) {
+func (client *Client) UpdateAccount(id string, data any, customFields ...types.CustomFields) (err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -123,14 +142,21 @@ func (client *Client) UpdateAccount(id string, data interface{}) (err error) {
 	if err != nil {
 		return
 	}
+	body, err := client.mergeCustomFields(data, customFields)
+	if err != nil {
+		return
+	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
-	req := client.httpClient.R().SetBody(data)
-	_, err = req.Patch(path)
-	return
+	req := client.httpClient.R().SetBody(body)
+	res, err := req.Patch(path)
+	if err != nil {
+		return
+	}
+	return client.handleObjectError(res)
 }
 
 // Update a case's fields.
-func (client *Client) UpdateCase(id string, data *types.CaseUpdate) (err error) {
+func (client *Client) UpdateCase(id string, data *types.CaseUpdate, customFields ...types.CustomFields) (err error) {
 	_, err = client.Case(id)
 	if err != nil {
 		return
@@ -143,14 +169,24 @@ func (client *Client) UpdateCase(id string, data *types.CaseUpdate) (err error) 
 	if err != nil {
 		return
 	}
+	body, err := client.mergeCustomFields(data, customFields)
+	if err != nil {
+		return
+	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
-	req := client.httpClient.R().SetBody(data)
-	_, err = req.Patch(path)
-	return
+	req := client.httpClient.R().
+		SetBody(body).
+		SetResult(&types.RecordCreatedResponse{}).
+		SetError(types.SalesforceErrorResponse{})
+	res, err := req.Patch(path)
+	if err != nil {
+		return
+	}
+	return client.handleObjectError(res)
 }
 
 // Create a new case.
-func (client *Client) CreateCase(data *types.CaseCreate, extra ...map[string]any) (result *types.RecordCreatedResponse, err error) {
+func (client *Client) CreateCase(data *types.CaseCreate, customFields ...types.CustomFields) (result *types.RecordCreatedResponse, err error) {
 	err = client.prepare()
 	if err != nil {
 		return
@@ -168,16 +204,19 @@ func (client *Client) CreateCase(data *types.CaseCreate, extra ...map[string]any
 	if err != nil {
 		return
 	}
-	firstExtra := map[string]any{}
-	if len(extra) != 0 {
-		firstExtra = extra[0]
-	}
-	body, err := util.MergeStructToMap(data, firstExtra)
+	body, err := client.mergeCustomFields(data, customFields)
 	if err != nil {
 		return
 	}
-	req := client.httpClient.R().SetBody(body).SetResult(&types.RecordCreatedResponse{})
+	req := client.httpClient.R().
+		SetBody(body).
+		SetResult(&types.RecordCreatedResponse{}).
+		SetError(types.SalesforceErrorResponse{})
 	res, err := req.Post(basePath)
+	if err != nil {
+		return
+	}
+	err = client.handleObjectError(res)
 	if err != nil {
 		return
 	}
@@ -196,6 +235,10 @@ func (client *Client) FeedItem(id string) (result *types.FeedItem, err error) {
 	}
 	req := client.httpClient.R().SetResult(&types.FeedItem{})
 	res, err := req.Get(fmt.Sprintf("%s/%s", basePath, id))
+	if err != nil {
+		return
+	}
+	err = client.handleObjectError(res)
 	if err != nil {
 		return
 	}

@@ -1,9 +1,7 @@
 package sfdc_test
 
 import (
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stellaraf/go-sfdc/types"
 	"github.com/stretchr/testify/assert"
@@ -18,8 +16,7 @@ func Test_AccountContact(t *testing.T) {
 }
 
 func Test_PostToCase(t *testing.T) {
-	now := time.Now()
-	subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
+	subject := createCaseSubject(t)
 	caseData := &types.CaseCreate{
 		AccountID:   Env.TestData.AccountID,
 		Comments:    "go-sfdc unit test case",
@@ -60,8 +57,7 @@ func Test_PostToCase(t *testing.T) {
 
 func Test_CloseCase(t *testing.T) {
 	t.Run("create a case and close it", func(t *testing.T) {
-		now := time.Now()
-		subject := fmt.Sprintf("go-sfdc Test_CloseCase case %s", now.Format(time.RFC3339))
+		subject := createCaseSubject(t)
 		caseData := &types.CaseCreate{
 			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
@@ -83,8 +79,7 @@ func Test_CloseCase(t *testing.T) {
 
 func Test_CaseByNumber(t *testing.T) {
 	t.Run("get a case by its case number", func(t *testing.T) {
-		now := time.Now()
-		subject := fmt.Sprintf("go-sfdc Test_CaseByNumber case %s", now.Format(time.RFC3339))
+		subject := createCaseSubject(t)
 		caseData := &types.CaseCreate{
 			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",

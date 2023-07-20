@@ -2,7 +2,6 @@ package _auth
 
 import (
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"net/url"
@@ -49,7 +48,7 @@ func parsePrivateKey(key []byte) (parsed any, err error) {
 	return
 }
 
-func (auth *Auth) GetNewToken() (token types.Token, err error) {
+func (auth *Auth) GetNewToken() (token *types.Token, err error) {
 	expiresAt := time.Now()
 	expiresAt = expiresAt.Add(time.Second * 300)
 	// SFDC requires that the audience be a single string, not an array.
@@ -78,32 +77,29 @@ func (auth *Auth) GetNewToken() (token types.Token, err error) {
 	req := auth.httpClient.R().
 		SetHeader("content-type", "application/x-www-form-urlencoded").
 		SetQueryParam("grant_type", GRANT_TYPE_JWT_BEARER).
-		SetQueryParam("assertion", assertion)
+		SetQueryParam("assertion", assertion).
+		SetResult(&types.Token{}).
+		SetError(&types.AuthErrorResponse{})
 
 	res, err := req.Post("/services/oauth2/token")
 	if err != nil {
 		return
 	}
-	err = util.CheckForError(res)
-	if err != nil {
+	if res.IsError() {
+		err = util.GetSFDCError(res.Error())
 		return
 	}
-	bodyBytes := res.Body()
-	if res.StatusCode() >= 400 {
-		detail := string(bodyBytes)
-		err = fmt.Errorf("failed to get new Salesforce access token due to error: '%s'", detail)
-		return
-	}
-	err = json.Unmarshal(bodyBytes, &token)
-	if err != nil {
+	token, ok := res.Result().(*types.Token)
+	if !ok {
+		detail := string(res.Body())
+		m := "failed to retrieve Salesforce access token"
+		if detail != "" {
+			m += fmt.Sprintf(" due to error: %s", detail)
+		}
+		err = fmt.Errorf(m)
 		return
 	}
 	token.ExpiresAt = expiresAt
-	if types.IsServerError(token) || types.IsQueryError(token) {
-		detail := util.GetSFDCError(token)
-		err = fmt.Errorf("failed to get new Salesforce access token due to error: '%s'", detail)
-		return
-	}
 	return
 }
 
@@ -133,7 +129,7 @@ func (auth *Auth) GetAccessToken() (token string, err error) {
 	return cachedToken, nil
 }
 
-func (auth *Auth) SetAccessToken(token types.Token) (err error) {
+func (auth *Auth) SetAccessToken(token *types.Token) (err error) {
 	expSeconds := token.ExpiresAt.Unix() / 1000
 	if auth.encryption {
 		var encrypted string
@@ -148,7 +144,7 @@ func (auth *Auth) SetAccessToken(token types.Token) (err error) {
 	return
 }
 
-func (auth *Auth) CacheNewToken(token types.Token) (err error) {
+func (auth *Auth) CacheNewToken(token *types.Token) (err error) {
 	err = auth.SetAccessToken(token)
 	if err != nil {
 		return

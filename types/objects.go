@@ -80,14 +80,15 @@ type User struct {
 
 type Group struct {
 	BaseObject
-	Name                   string `json:"Name"`
-	Developer_Name         string `json:"Developer_Name"`
-	RelatedID              string `json:"RelatedId,omitempty"`
-	QueueRoutingConfigID   string `json:"QueueRoutingConfigId,omitempty"`
-	DoesSendEmailToMembers bool   `json:"DoesSendEmailToMembers,omitempty"`
-	DoesIncludeBosses      bool   `json:"DoesIncludeBosses,omitempty"`
-	Email                  string `json:"Email,omitempty"`
-	Type                   string `json:"Type,omitempty"`
+	Name                   string       `json:"Name"`
+	Developer_Name         string       `json:"Developer_Name"`
+	RelatedID              string       `json:"RelatedId,omitempty"`
+	QueueRoutingConfigID   string       `json:"QueueRoutingConfigId,omitempty"`
+	DoesSendEmailToMembers bool         `json:"DoesSendEmailToMembers,omitempty"`
+	DoesIncludeBosses      bool         `json:"DoesIncludeBosses,omitempty"`
+	Email                  string       `json:"Email,omitempty"`
+	Type                   string       `json:"Type,omitempty"`
+	CustomFields           CustomFields `json:"-"`
 }
 
 type Account struct {
@@ -139,44 +140,49 @@ type Account struct {
 	CustomFields            CustomFields `json:"-"`
 }
 
-type CaseSummary struct {
-	ID      string `json:"Id"`
-	OwnerID string `json:"OwnerId"`
-	// RMMSeriesUID string `json:"rmmSeriesUid__c"`
-	Status string
-}
-
 type CaseUpdate struct {
-	Comments         string `json:"Comments,omitempty"`
-	Description      string `json:"Description,omitempty"`
-	ServiceReason    string `json:"Service_Reason__c,omitempty"`
-	ServiceSubReason string `json:"Service_SubReason__c,omitempty"`
-	ServiceType      string `json:"Service_Type__c,omitempty"`
-	Status           string `json:"Status,omitempty"`
-	Subject          string `json:"Subject,omitempty"`
-	Type             string `json:"Type,omitempty"`
+	Comments        string `json:"Comments,omitempty"`
+	ContactEmail    string `json:"ContactEmail,omitempty"`
+	ContactFax      string `json:"ContactFax,omitempty"`
+	ContactID       string `json:"ContactId,omitempty"`
+	ContactMobile   string `json:"ContactMobile,omitempty"`
+	ContactPhone    string `json:"ContactPhone,omitempty"`
+	Description     string `json:"Description,omitempty"`
+	EntitlementID   string `json:"EntitlementId,omitempty"`
+	IsEscalated     bool   `json:"IsEscalated,omitempty"`
+	IsStopped       bool   `json:"IsStopped,omitempty"`
+	Language        string `json:"Language,omitempty"`
+	MasterRecordID  string `json:"MasterRecordId,omitempty"`
+	MilestoneStatus string `json:"MilestoneStatus,omitempty"`
+	Origin          string `json:"Origin,omitempty"`
+	OwnerID         string `json:"OwnerId,omitempty"`
+	ParentId        string `json:"ParentId,omitempty"`
+	Reason          string `json:"Reason,omitempty"`
+	Status          string `json:"Status,omitempty"`
+	StopStartDate   string `json:"StopStartDate,omitempty"`
+	Subject         string `json:"Subject,omitempty"`
+	SuppliedCompany string `json:"SuppliedCompany,omitempty"`
+	SuppliedEmail   string `json:"SuppliedEmail,omitempty"`
+	SuppliedName    string `json:"SuppliedName,omitempty"`
+	SuppliedPhone   string `json:"SuppliedPhone,omitempty"`
+	Type            string `json:"Type,omitempty"`
 }
 
 type CaseCreate struct {
-	AccountID        string `json:"AccountId,omitempty"`
-	Comments         string `json:"Comments,omitempty"`
-	ContactID        string `json:"ContactId,omitempty"`
-	Description      string `json:"Description,omitempty"`
-	Origin           string `json:"Origin,omitempty"`
-	ServiceReason    string `json:"Service_Reason__c,omitempty"`
-	ServiceSubReason string `json:"Service_SubReason__c,omitempty"`
-	ServiceType      string `json:"Service_Type__c,omitempty"`
-	Status           string `json:"Status,omitempty"`
-	Subject          string `json:"Subject,omitempty"`
+	AccountID    string       `json:"AccountId,omitempty"`
+	Comments     string       `json:"Comments,omitempty"`
+	ContactID    string       `json:"ContactId,omitempty"`
+	Description  string       `json:"Description,omitempty"`
+	Origin       string       `json:"Origin,omitempty"`
+	Status       string       `json:"Status,omitempty"`
+	Subject      string       `json:"Subject,omitempty"`
+	CustomFields CustomFields `json:"-"`
 }
 
 type Case struct {
 	BaseObject
-	AccountId   string `json:"AccountId"`
-	CaseNumber  string `json:"CaseNumber"`
-	CaseComment string `json:"Case_Comment__c,omitempty"`
-	// LEGACY
-	CaseSubReason      string       `json:"Case_Sub_Reason__c,omitempty"`
+	AccountId          string       `json:"AccountId"`
+	CaseNumber         string       `json:"CaseNumber"`
 	ClosedDate         string       `json:"ClosedDate"`
 	Comments           string       `json:"Comments,omitempty"`
 	ContactEmail       string       `json:"ContactEmail,omitempty"`
@@ -185,10 +191,7 @@ type Case struct {
 	ContactMobile      string       `json:"ContactMobile,omitempty"`
 	ContactPhone       string       `json:"ContactPhone,omitempty"`
 	Description        string       `json:"Description,omitempty"`
-	DiscoveredSolution bool         `json:"Discovered_Solution__c,omitempty"`
-	EmailDomain        string       `json:"Email_Domain__c,omitempty"`
 	EntitlementID      string       `json:"EntitlementId,omitempty"`
-	ExternalTicketID   string       `json:"External_Ticket_Id__c,omitempty"`
 	IsClosed           bool         `json:"IsClosed,omitempty"`
 	IsDeleted          bool         `json:"IsDeleted,omitempty"`
 	IsEscalated        bool         `json:"IsEscalated,omitempty"`
@@ -199,25 +202,18 @@ type Case struct {
 	MasterRecordID     string       `json:"MasterRecordId,omitempty"`
 	MilestoneStatus    string       `json:"MilestoneStatus"`
 	Origin             string       `json:"Origin,omitempty"`
-	ParentId           string       `json:"ParentId,omitempty"`
+	OwnerID            string       `json:"OwnerId,omitempty"`
+	ParentID           string       `json:"ParentId,omitempty"`
+	Reason             string       `json:"Reason,omitempty"`
+	Status             string       `json:"Status,omitempty"`
+	StopStartDate      string       `json:"StopStartDate,omitempty"`
+	Subject            string       `json:"Subject"`
+	SuppliedCompany    string       `json:"SuppliedCompany,omitempty"`
+	SuppliedEmail      string       `json:"SuppliedEmail,omitempty"`
+	SuppliedName       string       `json:"SuppliedName,omitempty"`
+	SuppliedPhone      string       `json:"SuppliedPhone,omitempty"`
+	Type               string       `json:"Type,omitempty"`
 	CustomFields       CustomFields `json:"-"`
-	// LEGACY
-	Reason                string `json:"Reason,omitempty"`
-	ResolutionImplemented bool   `json:"Resolution_Implemented__c,omitempty"`
-	ServiceContract       string `json:"Service_Contract__c,omitempty"`
-	ServiceReason         string `json:"Service_Reason__c"`
-	ServiceSubReason      string `json:"Service_SubReason__c"`
-	ServiceType           string `json:"Service_Type__c"`
-	Status                string `json:"Status,omitempty"`
-	StopStartDate         string `json:"StopStartDate,omitempty"`
-	Subject               string `json:"Subject"`
-	SuppliedCompany       string `json:"SuppliedCompany,omitempty"`
-	SuppliedEmail         string `json:"SuppliedEmail,omitempty"`
-	SuppliedName          string `json:"SuppliedName,omitempty"`
-	SuppliedPhone         string `json:"SuppliedPhone,omitempty"`
-	Type                  string `json:"Type,omitempty"`
-	RMMSeriesUID          string `json:"rmmSeriesUid__c,omitempty"`
-	AlertID               string `json:"Alert_ID__c"`
 }
 
 type FeedItemOptions struct {

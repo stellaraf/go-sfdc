@@ -3,9 +3,9 @@ package sfdc_test
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stellaraf/go-sfdc/types"
+	"github.com/stellaraf/go-utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,8 +57,7 @@ func Test_Contact(t *testing.T) {
 
 func Test_CreateCase(t *testing.T) {
 	t.Run("create and cancel case", func(t *testing.T) {
-		now := time.Now()
-		subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
+		subject := createCaseSubject(t)
 		caseData := &types.CaseCreate{
 			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
@@ -75,9 +74,8 @@ func Test_CreateCase(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("create and cancel case with extra fields", func(t *testing.T) {
-		now := time.Now()
-		subject := fmt.Sprintf("go-sfdc Test_CreateCase case %s", now.Format(time.RFC3339))
+	t.Run("create a case with custom fields", func(t *testing.T) {
+		subject := createCaseSubject(t)
 		caseData := &types.CaseCreate{
 			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
@@ -87,13 +85,42 @@ func Test_CreateCase(t *testing.T) {
 			Status:      "New",
 			Subject:     subject,
 		}
-		extraData := map[string]any{
-			"rmmSeriesUid__c": "12345",
-		}
-		result, err := Client.CreateCase(caseData, extraData)
+		customFieldValue, err := utils.RandomString(16)
+		assert.NoError(t, err)
+		customFields := types.CustomFields{Env.TestData.CaseCustomFieldKey: customFieldValue}
+		result, err := Client.CreateCase(caseData, customFields)
 		assert.NoError(t, err)
 		assert.True(t, result.Success)
+		_case, err := Client.Case(result.ID)
+		assert.NoError(t, err)
+		assert.Equal(t, customFieldValue, _case.CustomFields[Env.TestData.CaseCustomFieldKey])
 		err = Client.UpdateCase(result.ID, &types.CaseUpdate{Status: "Canceled"})
 		assert.NoError(t, err)
+	})
+
+	t.Run("create case, change owner, verify owner", func(t *testing.T) {
+		subject := createCaseSubject(t)
+		caseData := &types.CaseCreate{
+			AccountID:   Env.TestData.AccountID,
+			Comments:    t.Name(),
+			ContactID:   Env.TestData.ContactID,
+			Description: subject,
+			Origin:      "Web",
+			Status:      "New",
+			Subject:     subject,
+		}
+		newCaseResult, err := Client.CreateCase(caseData)
+		assert.NoError(t, err)
+		assert.True(t, newCaseResult.Success)
+		err = Client.UpdateCase(newCaseResult.ID, &types.CaseUpdate{
+			Comments: fmt.Sprintf("changing owner to %s", Env.TestData.UserID),
+			OwnerID:  Env.TestData.UserID,
+		})
+		assert.NoError(t, err)
+		err = Client.CloseCase(newCaseResult.ID)
+		assert.NoError(t, err)
+		closedCase, err := Client.Case(newCaseResult.ID)
+		assert.NoError(t, err)
+		assert.Equal(t, Env.TestData.UserID, closedCase.OwnerID)
 	})
 }

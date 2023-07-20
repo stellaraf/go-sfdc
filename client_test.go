@@ -1,6 +1,8 @@
 package sfdc_test
 
 import (
+	"fmt"
+	"testing"
 	"time"
 
 	"github.com/muesli/cache2go"
@@ -76,4 +78,9 @@ func init() {
 	}
 	Client = client
 	Env = env
+}
+
+func createCaseSubject(t *testing.T) string {
+	now := time.Now()
+	return fmt.Sprintf("go-sfdc %s at %s", t.Name(), now.Format(time.RFC3339Nano))
 }
