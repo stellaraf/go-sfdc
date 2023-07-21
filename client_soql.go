@@ -5,7 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stellaraf/go-sfdc/util"
+	"github.com/stellaraf/go-sfdc/internal/util"
+	"github.com/stellaraf/go-utils"
 )
 
 type where struct {
@@ -50,13 +51,13 @@ func (s *soql) From(from string) *soql {
 // SOQL 'WHERE' function.
 func (s *soql) Where(key string, operator string, value interface{}) *soql {
 	var _where where
-	if util.IsArray(value) {
+	if utils.IsSlice(value) {
 		va := value.([]interface{})
 		k := va[0].(string)
 		op := va[1]
 		val := va[2]
 		var values []string
-		if util.IsArray(val) {
+		if utils.IsSlice(val) {
 			for _, v := range val.([]interface{}) {
 				values = append(values, fmt.Sprintf("'%v'", v))
 			}
@@ -82,10 +83,10 @@ func (s *soql) Where(key string, operator string, value interface{}) *soql {
 			val := fmt.Sprintf("'%%%v'", value)
 			_where = where{Key: key, Operator: "LIKE", Value: val}
 		default:
-			if util.IsTime(value) {
+			if utils.IsTime(value) {
 				val := value.(time.Time)
 				_where = where{Key: key, Operator: operator, Value: val.Format(time.RFC3339)}
-			} else if util.IsString(value) {
+			} else if utils.IsString(value) {
 				val := util.EscapeString(value.(string))
 				_where = where{Key: key, Operator: operator, Value: fmt.Sprintf("'%v'", val)}
 			} else {

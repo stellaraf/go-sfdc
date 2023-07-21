@@ -7,18 +7,17 @@ import (
 
 	"github.com/muesli/cache2go"
 	"github.com/stellaraf/go-sfdc"
-	"github.com/stellaraf/go-sfdc/types"
-	"github.com/stellaraf/go-sfdc/util"
+	"github.com/stellaraf/go-sfdc/internal/env"
 )
 
 var Client *sfdc.Client
-var Env types.Environment
+var Env env.Environment
 
 func setup() (
-	getAccessTokenCallback types.CachedTokenCallback,
-	setAccessTokenCallback types.SetTokenCallback,
-	getRefreshTokenCallback types.CachedTokenCallback,
-	setRefreshTokenCallback types.SetTokenCallback,
+	getAccessTokenCallback sfdc.CachedTokenCallback,
+	setAccessTokenCallback sfdc.SetTokenCallback,
+	getRefreshTokenCallback sfdc.CachedTokenCallback,
+	setRefreshTokenCallback sfdc.SetTokenCallback,
 	err error) {
 	cache := cache2go.Cache("go-sfdc-test")
 	cache.Flush()
@@ -50,8 +49,8 @@ func setup() (
 	return getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, nil
 }
 
-func initClient() (client *sfdc.Client, env types.Environment, err error) {
-	env, err = util.LoadEnv()
+func initClient() (client *sfdc.Client, e env.Environment, err error) {
+	e, err = env.LoadEnv()
 	if err != nil {
 		return
 	}
@@ -60,11 +59,11 @@ func initClient() (client *sfdc.Client, env types.Environment, err error) {
 		return
 	}
 	var encryptionPassphrase *string
-	if env.EncryptionPassphrase != "" {
-		encryptionPassphrase = &env.EncryptionPassphrase
+	if e.EncryptionPassphrase != "" {
+		encryptionPassphrase = &e.EncryptionPassphrase
 	}
-	client, err = sfdc.NewClient(
-		env.ClientID, env.PrivateKey, env.AuthUsername, env.AuthURL,
+	client, err = sfdc.New(
+		e.ClientID, e.PrivateKey, e.AuthUsername, e.AuthURL,
 		encryptionPassphrase,
 		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken,
 	)

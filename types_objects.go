@@ -1,6 +1,22 @@
-package types
+package sfdc
 
 type CustomFields map[string]any
+
+type Attributes struct {
+	Type string `json:"type"`
+	URL  string `json:"url"`
+}
+
+type BaseObject struct {
+	Attributes       Attributes `json:"attributes"`
+	CreatedByID      string     `json:"CreatedById"`
+	CreatedDate      string     `json:"CreatedDate"`
+	ID               string     `json:"Id"`
+	LastModifiedByID string     `json:"LastModifiedById"`
+	LastModifiedDate string     `json:"LastModifiedDate"`
+	OwnerID          string     `json:"OwnerId"`
+	SystemModStamp   string     `json:"SystemModstamp"`
+}
 
 type Contact struct {
 	BaseObject
@@ -94,7 +110,6 @@ type Group struct {
 type Account struct {
 	BaseObject
 	AccountSource           string       `json:"AccountSource,omitempty"`
-	AdditionalDomains       string       `json:"Additional_Domains__c,omitempty"`
 	BillingAddress          Address      `json:"BillingAddress,omitempty"`
 	BillingCity             string       `json:"BillingCity,omitempty"`
 	BillingCountry          string       `json:"BillingCountry,omitempty"`
@@ -104,27 +119,20 @@ type Account struct {
 	BillingPostalCode       string       `json:"BillingPostalCode,omitempty"`
 	BillingState            string       `json:"BillingState,omitempty"`
 	BillingStreet           string       `json:"BillingStreet,omitempty"`
-	CaseBCC                 string       `json:"Case_BCC__c,omitempty"`
 	ConnectionReceivedID    string       `json:"ConnectionReceivedId,omitempty"`
 	Description             string       `json:"Description,omitempty"`
-	EmailDomains            string       `json:"Email_Domains__c,omitempty"`
-	HasRMM                  bool         `json:"Has_RMM__c,omitempty"`
 	Industry                string       `json:"Industry,omitempty"`
 	IsDeleted               bool         `json:"IsDeleted,omitempty"`
-	ITGlueOrganizations     string       `json:"IT_Glue_Organizations__c,omitempty"`
 	Jigsaw                  string       `json:"Jigsaw,omitempty"`
 	JigsawCompanyID         string       `json:"JigsawCompanyId,omitempty"`
 	LastReferencedDate      string       `json:"LastReferencedDate"`
 	LastViewedDate          string       `json:"LastViewedDate,omitempty"`
-	MainPointOfContact      string       `json:"Main_Point_of_Contact__c,omitempty"`
 	MasterRecordID          string       `json:"MasterRecordId,omitempty"`
 	Name                    string       `json:"Name"`
 	NumberOfEmployees       string       `json:"NumberOfEmployees,omitempty"`
 	ParentID                string       `json:"ParentId,omitempty"`
 	Phone                   string       `json:"Phone,omitempty"`
 	PhotoUrl                string       `json:"PhotoUrl,omitempty"`
-	RMMOrganizations        string       `json:"RMM_Organizations__c,omitempty"`
-	ServiceIdentifier       string       `json:"Service_Identifier__c"`
 	ShippingAddress         Address      `json:"ShippingAddress,omitempty"`
 	ShippingCity            string       `json:"ShippingCity,omitempty"`
 	ShippingCountry         string       `json:"ShippingCountry,omitempty"`

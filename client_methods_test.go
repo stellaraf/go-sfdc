@@ -3,21 +3,13 @@ package sfdc_test
 import (
 	"testing"
 
-	"github.com/stellaraf/go-sfdc/types"
+	"github.com/stellaraf/go-sfdc"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_AccountContact(t *testing.T) {
-	t.Run("account contact", func(t *testing.T) {
-		contact, err := Client.AccountContact(Env.TestData.AccountID)
-		assert.NoError(t, err)
-		assert.Equal(t, Env.TestData.ContactID, contact.ID)
-	})
-}
-
 func Test_PostToCase(t *testing.T) {
 	subject := createCaseSubject(t)
-	caseData := &types.CaseCreate{
+	caseData := &sfdc.CaseCreate{
 		AccountID:   Env.TestData.AccountID,
 		Comments:    "go-sfdc unit test case",
 		ContactID:   Env.TestData.ContactID,
@@ -28,6 +20,7 @@ func Test_PostToCase(t *testing.T) {
 	}
 	newCase, _ := Client.CreateCase(caseData)
 	t.Run("post plain text update", func(t *testing.T) {
+		t.Parallel()
 		postResult, err := Client.PostToCase(newCase.ID, "go-sfdc test plain text comment", nil)
 		assert.NoError(t, err)
 		feedItem, err := Client.FeedItem(postResult.ID)
@@ -37,8 +30,9 @@ func Test_PostToCase(t *testing.T) {
 		assert.Greater(t, len(postResult.ID), 1)
 	})
 	t.Run("post html update", func(t *testing.T) {
+		t.Parallel()
 		body := "<b>go-sfdc test HTML comment</b>"
-		postResult, err := Client.PostToCase(newCase.ID, body, &types.FeedItemOptions{
+		postResult, err := Client.PostToCase(newCase.ID, body, &sfdc.FeedItemOptions{
 			IsRichText: true,
 		})
 		assert.NoError(t, err)
@@ -51,14 +45,15 @@ func Test_PostToCase(t *testing.T) {
 		assert.Equal(t, body, feedItem.Body)
 	})
 	t.Cleanup(func() {
-		Client.UpdateCase(newCase.ID, &types.CaseUpdate{Status: "Canceled"})
+		Client.UpdateCase(newCase.ID, &sfdc.CaseUpdate{Status: "Canceled"})
 	})
 }
 
 func Test_CloseCase(t *testing.T) {
 	t.Run("create a case and close it", func(t *testing.T) {
+		t.Parallel()
 		subject := createCaseSubject(t)
-		caseData := &types.CaseCreate{
+		caseData := &sfdc.CaseCreate{
 			AccountID:   Env.TestData.AccountID,
 			Comments:    "go-sfdc unit test case",
 			ContactID:   Env.TestData.ContactID,
@@ -74,30 +69,5 @@ func Test_CloseCase(t *testing.T) {
 		closedCase, err := Client.Case(newCase.ID)
 		assert.NoError(t, err)
 		assert.Equal(t, "Closed", closedCase.Status)
-	})
-}
-
-func Test_CaseByNumber(t *testing.T) {
-	t.Run("get a case by its case number", func(t *testing.T) {
-		subject := createCaseSubject(t)
-		caseData := &types.CaseCreate{
-			AccountID:   Env.TestData.AccountID,
-			Comments:    "go-sfdc unit test case",
-			ContactID:   Env.TestData.ContactID,
-			Description: subject,
-			Origin:      "Web",
-			Status:      "New",
-			Subject:     subject,
-		}
-		res, err := Client.CreateCase(caseData)
-		assert.NoError(t, err)
-		assert.True(t, res.Success)
-		newCase, err := Client.Case(res.ID)
-		assert.NoError(t, err)
-		caseByNumber, err := Client.CaseByNumber(newCase.CaseNumber)
-		assert.NoError(t, err)
-		assert.Equal(t, newCase.CaseNumber, caseByNumber.CaseNumber)
-		err = Client.UpdateCase(res.ID, &types.CaseUpdate{Status: "Canceled"})
-		assert.NoError(t, err)
 	})
 }

@@ -49,8 +49,8 @@ func ExampleClient_Customers() {
 		// handle error
 	}
 	for _, customer := range customers {
-		fmt.Printf("Id=%s, Name=%s, Type=%s, ServiceIdentifier=%s", customer.ID, customer.Name, customer.Type, customer.ServiceIdentifier)
-		// Example Output: Id=00QG00000567DCBAZY, Name=Acme Corp, Type=Customer, ServiceIdentifier=0123456
+		fmt.Printf("Id=%s, Name=%s, Type=%s", customer.ID, customer.Name, customer.Type)
+		// Example Output: Id=00QG00000567DCBAZY, Name=Acme Corp, Type=Customer
 		// ...
 	}
 }

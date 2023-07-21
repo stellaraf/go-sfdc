@@ -1,20 +1,20 @@
-package _auth
+package sfdc_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/muesli/cache2go"
-	"github.com/stellaraf/go-sfdc/types"
-	"github.com/stellaraf/go-sfdc/util"
+	"github.com/stellaraf/go-sfdc"
+	"github.com/stellaraf/go-sfdc/internal/env"
 	"github.com/stretchr/testify/assert"
 )
 
-func setup() (
-	getAccessTokenCallback types.CachedTokenCallback,
-	setAccessTokenCallback types.SetTokenCallback,
-	getRefreshTokenCallback types.CachedTokenCallback,
-	setRefreshTokenCallback types.SetTokenCallback,
+func setupAuth() (
+	getAccessTokenCallback sfdc.CachedTokenCallback,
+	setAccessTokenCallback sfdc.SetTokenCallback,
+	getRefreshTokenCallback sfdc.CachedTokenCallback,
+	setRefreshTokenCallback sfdc.SetTokenCallback,
 	err error) {
 	cache := cache2go.Cache("go-sfdc-test")
 	cache.Flush()
@@ -46,8 +46,8 @@ func setup() (
 	return getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, nil
 }
 
-func initAuth() (auth *Auth, err error) {
-	env, err := util.LoadEnv()
+func initAuth() (auth *sfdc.Auth, err error) {
+	env, err := env.LoadEnv()
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func initAuth() (auth *Auth, err error) {
 	if env.EncryptionPassphrase != "" {
 		encryptionPassphrase = &env.EncryptionPassphrase
 	}
-	auth, err = NewAuth(
+	auth, err = sfdc.NewAuth(
 		env.ClientID,
 		env.PrivateKey,
 		env.AuthUsername,
@@ -83,11 +83,11 @@ func Test_Auth(t *testing.T) {
 	})
 
 	t.Run("test auth errors", func(t *testing.T) {
-		env, err := util.LoadEnv()
+		env, err := env.LoadEnv()
 		assert.NoError(t, err)
-		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setup()
+		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setupAuth()
 		assert.NoError(t, err)
-		_, err = NewAuth(
+		_, err = sfdc.NewAuth(
 			"invalid-client-key",
 			env.PrivateKey,
 			env.AuthUsername,

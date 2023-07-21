@@ -1,9 +1,13 @@
-package types
+package sfdc
 
 import (
 	"encoding/json"
 	"time"
 )
+
+type CachedTokenCallback func() (string, error)
+
+type SetTokenCallback func(token string, expiresIn float64) error
 
 type Token struct {
 	ID          string    `json:"id"`

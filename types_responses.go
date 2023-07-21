@@ -1,8 +1,4 @@
-package types
-
-type CachedTokenCallback func() (string, error)
-
-type SetTokenCallback func(token string, expiresIn float64) error
+package sfdc
 
 type RecordCreatedResponse struct {
 	Errors  []string `json:"errors"`

@@ -1,4 +1,4 @@
-package types
+package env
 
 type TestData struct {
 	AccountID             string `json:"accountId"`

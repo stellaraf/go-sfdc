@@ -1,4 +1,4 @@
-package _auth
+package sfdc
 
 import (
 	"crypto/x509"
@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/stellaraf/go-sfdc/types"
-	"github.com/stellaraf/go-sfdc/util"
+	"github.com/stellaraf/go-sfdc/internal/util"
+	"github.com/stellaraf/go-utils/encryption"
 )
 
 const GRANT_TYPE_JWT_BEARER string = "urn:ietf:params:oauth:grant-type:jwt-bearer"
@@ -24,10 +24,10 @@ type Auth struct {
 	authURL                 *url.URL
 	encryption              bool
 	encryptionPassphrase    string
-	getAccessTokenCallback  types.CachedTokenCallback
-	setAccessTokenCallback  types.SetTokenCallback
-	getRefreshTokenCallback types.CachedTokenCallback
-	setRefreshTokenCallback types.SetTokenCallback
+	getAccessTokenCallback  CachedTokenCallback
+	setAccessTokenCallback  SetTokenCallback
+	getRefreshTokenCallback CachedTokenCallback
+	setRefreshTokenCallback SetTokenCallback
 }
 
 func parsePrivateKey(key []byte) (parsed any, err error) {
@@ -48,7 +48,7 @@ func parsePrivateKey(key []byte) (parsed any, err error) {
 	return
 }
 
-func (auth *Auth) GetNewToken() (token *types.Token, err error) {
+func (auth *Auth) GetNewToken() (token *Token, err error) {
 	expiresAt := time.Now()
 	expiresAt = expiresAt.Add(time.Second * 300)
 	// SFDC requires that the audience be a single string, not an array.
@@ -78,18 +78,18 @@ func (auth *Auth) GetNewToken() (token *types.Token, err error) {
 		SetHeader("content-type", "application/x-www-form-urlencoded").
 		SetQueryParam("grant_type", GRANT_TYPE_JWT_BEARER).
 		SetQueryParam("assertion", assertion).
-		SetResult(&types.Token{}).
-		SetError(&types.AuthErrorResponse{})
+		SetResult(&Token{}).
+		SetError(&AuthErrorResponse{})
 
 	res, err := req.Post("/services/oauth2/token")
 	if err != nil {
 		return
 	}
 	if res.IsError() {
-		err = util.GetSFDCError(res.Error())
+		err = getSFDCError(res.Error())
 		return
 	}
-	token, ok := res.Result().(*types.Token)
+	token, ok := res.Result().(*Token)
 	if !ok {
 		detail := string(res.Body())
 		m := "failed to retrieve Salesforce access token"
@@ -120,7 +120,7 @@ func (auth *Auth) GetAccessToken() (token string, err error) {
 		return newToken.AccessToken, nil
 	}
 	if auth.encryption {
-		decrypted, err := util.Decrypt(auth.encryptionPassphrase, cachedToken)
+		decrypted, err := encryption.Decrypt(auth.encryptionPassphrase, cachedToken)
 		if err != nil {
 			return "", err
 		}
@@ -129,11 +129,11 @@ func (auth *Auth) GetAccessToken() (token string, err error) {
 	return cachedToken, nil
 }
 
-func (auth *Auth) SetAccessToken(token *types.Token) (err error) {
+func (auth *Auth) SetAccessToken(token *Token) (err error) {
 	expSeconds := token.ExpiresAt.Unix() / 1000
 	if auth.encryption {
 		var encrypted string
-		encrypted, err = util.Encrypt(token.AccessToken, auth.encryptionPassphrase)
+		encrypted, err = encryption.Encrypt(token.AccessToken, auth.encryptionPassphrase)
 		if err != nil {
 			return
 		}
@@ -144,7 +144,7 @@ func (auth *Auth) SetAccessToken(token *types.Token) (err error) {
 	return
 }
 
-func (auth *Auth) CacheNewToken(token *types.Token) (err error) {
+func (auth *Auth) CacheNewToken(token *Token) (err error) {
 	err = auth.SetAccessToken(token)
 	if err != nil {
 		return
@@ -155,10 +155,10 @@ func (auth *Auth) CacheNewToken(token *types.Token) (err error) {
 func NewAuth(
 	clientID, privateKey, username, authURL string,
 	encryption *string,
-	getAccessTokenCallback types.CachedTokenCallback,
-	setAccessTokenCallback types.SetTokenCallback,
-	getRefreshTokenCallback types.CachedTokenCallback,
-	setRefreshTokenCallback types.SetTokenCallback,
+	getAccessTokenCallback CachedTokenCallback,
+	setAccessTokenCallback SetTokenCallback,
+	getRefreshTokenCallback CachedTokenCallback,
+	setRefreshTokenCallback SetTokenCallback,
 ) (auth *Auth, err error) {
 	// parse auth base URL and set base URL of http client
 	var doEncrypt bool
@@ -176,7 +176,7 @@ func NewAuth(
 	}
 	httpClient.SetHeader("user-agent", "go-sfdc")
 	httpClient.SetBaseURL(fmt.Sprintf("%s://%s", parsedAuthURL.Scheme, parsedAuthURL.Host))
-	key := formatPrivateKey(privateKey)
+	key := util.FormatPrivateKey(privateKey)
 	auth = &Auth{
 		InstanceURL:             nil,
 		authURL:                 parsedAuthURL,

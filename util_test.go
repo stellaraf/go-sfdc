@@ -1,49 +1,51 @@
-package util_test
+package sfdc
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/stellaraf/go-sfdc/types"
-	"github.com/stellaraf/go-sfdc/util"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_GetSFDCError(t *testing.T) {
+func Test_getSFDCError(t *testing.T) {
 	t.Run("server error", func(t *testing.T) {
-		e := types.SalesforceErrorResponse{
-			&types.SalesforceError{
+		t.Parallel()
+		e := SalesforceErrorResponse{
+			&SalesforceError{
 				ErrorCode: "ERROR_CODE",
 				Message:   "Error Message",
 				Fields:    []string{},
 			},
 		}
-		expected := "Error: [ERROR_CODE] Error Message"
-		result := util.GetSFDCErrorString(e)
+		expected := "error: [ERROR_CODE] Error Message"
+		result := getSFDCErrorString(e)
 		assert.Equal(t, expected, result)
 	})
 	t.Run("generic error", func(t *testing.T) {
-		e := types.GenericResponse{
+		t.Parallel()
+		e := GenericResponse{
 			Message: "Message",
 			Data:    map[string]any{},
 		}
-		expected := "Error: Message"
-		result := util.GetSFDCErrorString(e)
+		expected := "error: Message"
+		result := getSFDCErrorString(e)
 		assert.Equal(t, expected, result)
 	})
 	t.Run("auth error", func(t *testing.T) {
-		e := types.AuthErrorResponse{
+		t.Parallel()
+		e := AuthErrorResponse{
 			Error:            "AUTH_ERROR",
 			ErrorDescription: "Authentication Error",
 		}
-		expected := "Error: [AUTH_ERROR] Authentication Error"
-		result := util.GetSFDCErrorString(e)
+		expected := "error: [AUTH_ERROR] Authentication Error"
+		result := getSFDCErrorString(e)
 		assert.Equal(t, expected, result)
 	})
 	t.Run("default", func(t *testing.T) {
+		t.Parallel()
 		e := fmt.Errorf("some other error")
-		expected := "Error: some other error"
-		result := util.GetSFDCErrorString(e)
+		expected := "unknown error: some other error"
+		result := getSFDCErrorString(e)
 		assert.Equal(t, expected, result)
 	})
 }

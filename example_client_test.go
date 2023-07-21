@@ -8,7 +8,7 @@ import (
 )
 
 // In this example, the cache2go caching backend is used, but any caching backend can be used.
-func ExampleNewClient() {
+func ExampleNew() {
 	cache := cache2go.Cache("go-sfdc")
 	cache.Flush()
 
@@ -66,7 +66,7 @@ func ExampleNewClient() {
 	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm
 	username := "user@example.com"
 
-	client, err := sfdc.NewClient(
+	client, err := sfdc.New(
 		clientID,
 		privateKey,
 		username,

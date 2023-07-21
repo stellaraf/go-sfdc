@@ -2,11 +2,6 @@ package sfdc
 
 import (
 	"fmt"
-	"reflect"
-
-	"github.com/go-resty/resty/v2"
-	"github.com/perimeterx/marshmallow"
-	"github.com/stellaraf/go-sfdc/util"
 )
 
 const API_VERSION string = "v56.0"
@@ -40,26 +35,5 @@ func getPath(pathName string) (path string, err error) {
 		return
 	}
 	path = fmt.Sprintf(pathT, API_VERSION)
-	return
-}
-
-func handleResponse(res *resty.Response, obj any) (err error) {
-	err = util.CheckForError(res)
-	if err != nil {
-		return
-	}
-	p := reflect.ValueOf(obj)
-	if p.Kind() != reflect.Pointer {
-		err = fmt.Errorf("expected pointer type")
-		return
-	}
-	s := p.Elem()
-	body := res.Body()
-	extra, err := marshmallow.Unmarshal(body, obj)
-	f := s.FieldByName("CustomFields")
-	e := reflect.ValueOf(extra)
-	if f.CanSet() {
-		f.Set(e)
-	}
 	return
 }

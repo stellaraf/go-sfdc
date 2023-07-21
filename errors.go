@@ -1,4 +1,4 @@
-package types
+package sfdc
 
 import (
 	"errors"
@@ -25,7 +25,7 @@ func (er *SalesforceErrorResponse) GetErrorString() string {
 		s := fmt.Sprintf(fs, e.ErrorCode, e.Message)
 		parts = append(parts, s)
 	}
-	result := fmt.Sprintf("Error: %s", strings.Join(parts, "; "))
+	result := fmt.Sprintf("error: %s", strings.Join(parts, "; "))
 	return result
 }
 
@@ -39,13 +39,8 @@ type AuthErrorResponse struct {
 }
 
 func (a *AuthErrorResponse) GetErrorString() string {
-	return fmt.Sprintf("Error: [%s] %s", a.Error, a.ErrorDescription)
+	return fmt.Sprintf("error: [%s] %s", a.Error, a.ErrorDescription)
 }
 func (a *AuthErrorResponse) GetError() error {
 	return errors.New(a.GetErrorString())
-}
-
-type QueryErrorResponse struct {
-	ErrorCode string `json:"errorCode"`
-	Message   string `json:"message"`
 }

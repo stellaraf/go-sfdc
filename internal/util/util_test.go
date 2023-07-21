@@ -1,8 +1,9 @@
-package _auth
+package util_test
 
 import (
 	"testing"
 
+	"github.com/stellaraf/go-sfdc/internal/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -112,11 +113,60 @@ Q2xwK8VmxtLW8QLuMuwTC1SUPKXCkzSGAydKmN1wduvuKewdKClTtW5z2g==
 
 func Test_formatPrivateKey(t *testing.T) {
 	t.Run("format key without spaces", func(t *testing.T) {
-		result := formatPrivateKey(private_key_no_spaces)
+		t.Parallel()
+		result := util.FormatPrivateKey(private_key_no_spaces)
 		assert.Equal(t, private_key_no_spaces, result)
 	})
 	t.Run("format key with spaces", func(t *testing.T) {
-		result := formatPrivateKey(private_key_with_spaces)
+		t.Parallel()
+		result := util.FormatPrivateKey(private_key_with_spaces)
 		assert.Equal(t, private_key_no_spaces, result)
+	})
+}
+
+func Test_EscapeString(t *testing.T) {
+	t.Run("replaces string with single quote", func(t *testing.T) {
+		t.Parallel()
+		in := `John's Bike`
+		expected := `John\'s Bike`
+		result := util.EscapeString(in)
+		assert.Equal(t, expected, result)
+	})
+	t.Run("replaces string with double quote", func(t *testing.T) {
+		t.Parallel()
+		in := `I said "that".`
+		expected := `I said \"that\".`
+		result := util.EscapeString(in)
+		assert.Equal(t, expected, result)
+	})
+	t.Run("replaces string with backslash", func(t *testing.T) {
+		t.Parallel()
+		in := `This\That.`
+		expected := `This\\That.`
+		result := util.EscapeString(in)
+		assert.Equal(t, expected, result)
+	})
+}
+
+func Test_MergeStructToMap(t *testing.T) {
+	t.Run("merge struct with map", func(t *testing.T) {
+		t.Parallel()
+		keys := []string{"a", "b", "c", "d"}
+		type S struct {
+			A string `json:"a"`
+			B string `json:"b"`
+		}
+		s := &S{
+			A: "a",
+			B: "b",
+		}
+		m := map[string]any{"c": "c", "d": "d"}
+		result, err := util.MergeStructToMap(s, m)
+		assert.NoError(t, err)
+		assert.IsType(t, map[string]any{}, result)
+		for _, k := range keys {
+			v := result[k]
+			assert.Equal(t, k, v)
+		}
 	})
 }

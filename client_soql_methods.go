@@ -3,8 +3,6 @@ package sfdc
 
 import (
 	"fmt"
-
-	"github.com/stellaraf/go-sfdc/types"
 )
 
 type SOQLClient[T any] struct {
@@ -12,12 +10,12 @@ type SOQLClient[T any] struct {
 }
 
 // Query the Salesforce SOQL API with the created SOQL query.
-func (client *SOQLClient[T]) Query(soqlQuery *soql) (results types.RecordResponse[T], err error) {
+func (soqlClient *SOQLClient[T]) Query(soqlQuery *soql) (results RecordResponse[T], err error) {
 	query, err := soqlQuery.String()
 	if err != nil {
 		return
 	}
-	err = client.prepare()
+	err = soqlClient.prepare()
 	if err != nil {
 		return
 	}
@@ -25,24 +23,27 @@ func (client *SOQLClient[T]) Query(soqlQuery *soql) (results types.RecordRespons
 	if err != nil {
 		return
 	}
-	req := client.httpClient.R()
-	req.SetQueryParam("q", query)
+	req := soqlClient.httpClient.R().
+		SetQueryParam("q", query).
+		SetResult(RecordResponse[T]{}).
+		SetError(SalesforceErrorResponse{})
+
 	res, err := req.Get(path)
 	if err != nil {
 		return
 	}
-	err = handleResponse(res, &results)
+	err = soqlClient.handleResponse(res, &results)
 	return
 }
 
-func NewSOQLClient[T any](client *Client) (sc *SOQLClient[T]) {
+func NewSOQL[T any](client *Client) (sc *SOQLClient[T]) {
 	sc = &SOQLClient[T]{*client}
 	return
 }
 
 // Retrieve a summary of all open cases.
-func (client *Client) OpenCases() (cases []types.OpenCase, err error) {
-	sc := NewSOQLClient[types.OpenCase](client)
+func (client *Client) OpenCases() (cases []OpenCase, err error) {
+	sc := NewSOQL[OpenCase](client)
 	q := SOQL().
 		Select("Id", "Subject", "OwnerId").
 		From("Case").
@@ -58,7 +59,7 @@ func (client *Client) OpenCases() (cases []types.OpenCase, err error) {
 
 // Retrieve the name of a user based on that user's ID.
 func (client *Client) UserName(id string) (name string, err error) {
-	sc := NewSOQLClient[types.User](client)
+	sc := NewSOQL[User](client)
 	q := SOQL().
 		Select("Id", "Name").
 		From("User").
@@ -78,7 +79,7 @@ func (client *Client) UserName(id string) (name string, err error) {
 
 // Retrieve the name of a group based on the group's ID.
 func (client *Client) GroupName(id string) (name string, err error) {
-	sc := NewSOQLClient[types.ObjectSummary](client)
+	sc := NewSOQL[ObjectSummary](client)
 	q := SOQL().
 		Select("Id", "Name").
 		From("Group").
@@ -98,7 +99,7 @@ func (client *Client) GroupName(id string) (name string, err error) {
 
 // Find an account's ID based on the account's name.
 func (client *Client) AccountIDFromName(name string) (id string, err error) {
-	sc := NewSOQLClient[types.Account](client)
+	sc := NewSOQL[Account](client)
 	q := SOQL().
 		Select("Id", "Name").
 		From("Account").
@@ -117,10 +118,10 @@ func (client *Client) AccountIDFromName(name string) (id string, err error) {
 }
 
 // Retrieve a summary of all accounts where the 'Type' field is 'Customer'.
-func (client *Client) Customers() (accounts []types.Customer, err error) {
-	sc := NewSOQLClient[types.Customer](client)
+func (client *Client) Customers() (accounts []Customer, err error) {
+	sc := NewSOQL[Customer](client)
 	q := SOQL().
-		Select("Id", "Name", "Type", "Service_Identifier__c").
+		Select("Id", "Name", "Type").
 		From("Account").
 		Where("Type", "=", "Customer")
 	res, err := sc.Query(q)
@@ -128,5 +129,29 @@ func (client *Client) Customers() (accounts []types.Customer, err error) {
 		return
 	}
 	accounts = res.Records
+	return
+}
+
+// Retrieve a case by its case number.
+func (client *Client) CaseByNumber(caseNumber string) (result *Case, err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	query := SOQL().Select("Id").From("Case").Where("CaseNumber", "=", caseNumber)
+	if err != nil {
+		return
+	}
+	sc := NewSOQL[ObjectID](client)
+	queryResult, err := sc.Query(query)
+	if err != nil {
+		return
+	}
+	if len(queryResult.Records) == 0 {
+		err = fmt.Errorf("case with case number '%s' not found", caseNumber)
+		return
+	}
+	caseID := queryResult.Records[0].ID
+	result, err = client.Case(caseID)
 	return
 }

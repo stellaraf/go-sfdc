@@ -1,10 +1,9 @@
-package types
+package sfdc
 
 type Customer struct {
-	ID                string `json:"Id"`
-	Name              string `json:"Name"`
-	Type              string `json:"Type"`
-	ServiceIdentifier string `json:"Service_Identifier__c"`
+	ID   string `json:"Id"`
+	Name string `json:"Name"`
+	Type string `json:"Type"`
 }
 
 type OpenCase struct {

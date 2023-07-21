@@ -1,4 +1,4 @@
-package util
+package env
 
 import (
 	"encoding/json"
@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/stellaraf/go-sfdc/types"
 )
 
 func findGoMod(start string) (dir string, err error) {
@@ -18,7 +17,10 @@ func findGoMod(start string) (dir string, err error) {
 			return err
 		}
 		if strings.Contains(file.Name(), "go.mod") {
-			dir = filepath.Dir(path)
+			dir, err = filepath.Abs(filepath.Dir(path))
+			if err != nil {
+				return err
+			}
 			return nil
 		}
 		return nil
@@ -26,11 +28,16 @@ func findGoMod(start string) (dir string, err error) {
 	return
 }
 
-func findProjectRoot() (root string, err error) {
-	start := "."
+func FindProjectRoot() (root string, err error) {
+	start, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	loops := 0
 	for {
-		if len(start) > 4 {
-			err = fmt.Errorf("failed to locate project root, exceeded depth of 4")
+		loops++
+		if loops > 8 {
+			err = fmt.Errorf("failed to locate project root, exceeded depth of 8")
 			return
 		}
 		dir, err := findGoMod(start)
@@ -38,7 +45,10 @@ func findProjectRoot() (root string, err error) {
 			return "", err
 		}
 		if dir == "" {
-			start += "."
+			start, err = filepath.Abs(filepath.Dir(start))
+			if err != nil {
+				return "", err
+			}
 			continue
 		} else {
 			root, err = filepath.Abs(dir)
@@ -52,7 +62,7 @@ func findProjectRoot() (root string, err error) {
 }
 
 func loadDotEnv() (err error) {
-	projectRoot, err := findProjectRoot()
+	projectRoot, err := FindProjectRoot()
 	if err != nil {
 		return
 	}
@@ -66,7 +76,7 @@ func loadDotEnv() (err error) {
 	return
 }
 
-func LoadEnv() (env types.Environment, err error) {
+func LoadEnv() (env Environment, err error) {
 	err = loadDotEnv()
 	if err != nil {
 		return
@@ -77,12 +87,12 @@ func LoadEnv() (env types.Environment, err error) {
 	authURL := os.Getenv("SFDC_AUTH_URL")
 	authUsername := os.Getenv("SFDC_AUTH_USERNAME")
 	testDataRaw := os.Getenv("SFDC_TEST_DATA")
-	var testData types.TestData
+	var testData TestData
 	err = json.Unmarshal([]byte(testDataRaw), &testData)
 	if err != nil {
 		return
 	}
-	env = types.Environment{
+	env = Environment{
 		ClientID:             clientId,
 		EncryptionPassphrase: encryptionPassphrase,
 		PrivateKey:           privateKey,
