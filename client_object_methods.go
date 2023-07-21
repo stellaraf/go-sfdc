@@ -178,6 +178,10 @@ func (client *Client) UpdateCase(id string, data *CaseUpdate, customFields ...ma
 		SetBody(body).
 		SetResult(&RecordCreatedResponse{}).
 		SetError(SalesforceErrorResponse{})
+
+	if data.SkipAutoAssign {
+		req.SetHeader("Sforce-Auto-Assign", "FALSE")
+	}
 	res, err := req.Patch(path)
 	if err != nil {
 		return

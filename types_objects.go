@@ -149,6 +149,9 @@ type Account struct {
 }
 
 type CaseUpdate struct {
+	// Options
+	SkipAutoAssign bool `json:"-"`
+	// Fields
 	Comments        string `json:"Comments,omitempty"`
 	ContactEmail    string `json:"ContactEmail,omitempty"`
 	ContactFax      string `json:"ContactFax,omitempty"`
