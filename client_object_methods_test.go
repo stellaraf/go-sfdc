@@ -51,6 +51,15 @@ func Test_Case(t *testing.T) {
 	})
 }
 
+func Test_ServiceContract(t *testing.T) {
+	t.Run("get service contract", func(t *testing.T) {
+		t.Parallel()
+		contract, err := Client.ServiceContract(Env.TestData.ServiceContractID)
+		assert.NoError(t, err)
+		assert.Equal(t, Env.TestData.ServiceContractID, contract.ID)
+	})
+}
+
 func Test_Contact(t *testing.T) {
 	t.Run("get contact", func(t *testing.T) {
 		t.Parallel()

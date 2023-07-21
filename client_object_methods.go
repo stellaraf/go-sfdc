@@ -107,6 +107,31 @@ func (client *Client) Case(id string) (_case *Case, err error) {
 	return
 }
 
+// Retrieve a Service Contract.
+func (client *Client) ServiceContract(id string) (contract *ServiceContract, err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	basePath, err := getPath("service_contract")
+	if err != nil {
+		return
+	}
+	path := fmt.Sprintf("%s/%s", basePath, id)
+	req := client.httpClient.R()
+	res, err := req.Get(path)
+	if err != nil {
+		return
+	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return
+	}
+	contract = &ServiceContract{}
+	err = client.handleResponse(res, contract)
+	return
+}
+
 // Retrieve a Contact.
 func (client *Client) Contact(id string) (contact *Contact, err error) {
 	err = client.prepare()

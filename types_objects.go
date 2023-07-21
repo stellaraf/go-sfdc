@@ -298,3 +298,52 @@ type FeedItem struct {
 	IsClosed           bool       `json:"IsClosed"`
 	Status             string     `json:"Status"`
 }
+
+type ServiceContract struct {
+	BaseObject
+	AccountID               string   `json:"AccountId,omitempty"`
+	ActivationDate          string   `json:"ActivationDate,omitempty"`
+	ApprovalStatus          string   `json:"ApprovalStatus,omitempty"`
+	BillingAddress          *Address `json:"BillingAddress,omitempty"`
+	BillingCity             string   `json:"BillingCity,omitempty"`
+	BillingCountry          string   `json:"BillingCountry,omitempty"`
+	BillingGeocodeAccuracy  string   `json:"BillingGeocodeAccuracy,omitempty"`
+	BillingLatitude         int      `json:"BillingLatitude,omitempty"`
+	BillingLongitude        int      `json:"BillingLongitude,omitempty"`
+	BillingPostalCode       string   `json:"BillingPostalCode,omitempty"`
+	BillingState            string   `json:"BillingState,omitempty"`
+	BillingStreet           string   `json:"BillingStreet,omitempty"`
+	ContactID               string   `json:"ContactId,omitempty"`
+	ContractNumber          string   `json:"ContractNumber,omitempty"`
+	Description             string   `json:"Description,omitempty"`
+	Discount                float64  `json:"Discount,omitempty"`
+	EndDate                 string   `json:"EndDate,omitempty"`
+	GrandTotal              float64  `json:"GrandTotal,omitempty"`
+	IsDeleted               bool     `json:"IsDeleted,omitempty"`
+	LastReferencedDate      string   `json:"LastReferencedDate,omitempty"`
+	LastViewedDate          string   `json:"LastViewedDate,omitempty"`
+	LineItemCount           int      `json:"LineItemCount,omitempty"`
+	Name                    string   `json:"Name,omitempty"`
+	ParentServiceContractID string   `json:"ParentServiceContractId,omitempty"`
+	Pricebook2ID            string   `json:"Pricebook2Id,omitempty"`
+	RecordTypeID            string   `json:"RecordTypeId,omitempty"`
+	RootServiceContractID   string   `json:"RootServiceContractId,omitempty"`
+	ShippingAddress         *Address `json:"ShippingAddress,omitempty"`
+	ShippingCity            string   `json:"ShippingCity,omitempty"`
+	ShippingCountry         string   `json:"ShippingCountry,omitempty"`
+	ShippingGeocodeAccuracy string   `json:"ShippingGeocodeAccuracy,omitempty"`
+	ShippingLatitude        int      `json:"ShippingLatitude,omitempty"`
+	ShippingLongitude       int      `json:"ShippingLongitude,omitempty"`
+	ShippingPostalCode      string   `json:"ShippingPostalCode,omitempty"`
+	ShippingState           string   `json:"ShippingState,omitempty"`
+	ShippingStreet          string   `json:"ShippingStreet,omitempty"`
+	ShippingHandling        float64  `json:"ShippingHandling,omitempty"`
+	SpecialTerms            string   `json:"SpecialTerms,omitempty"`
+	StartDate               string   `json:"StartDate,omitempty"`
+	Status                  string   `json:"Status,omitempty"`
+	Subtotal                float64  `json:"Subtotal,omitempty"`
+	SystemModstamp          string   `json:"SystemModstamp,omitempty"`
+	Tax                     float64  `json:"Tax,omitempty"`
+	Term                    int      `json:"Term,omitempty"`
+	TotalPrice              float64  `json:"TotalPrice,omitempty"`
+}
