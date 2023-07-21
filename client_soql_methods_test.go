@@ -83,3 +83,12 @@ func Test_CaseByNumber(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func Test_UserByEmail(t *testing.T) {
+	t.Run("get a user by its email address", func(t *testing.T) {
+		t.Parallel()
+		result, err := Client.UserByEmail(Env.TestData.UserEmail)
+		assert.NoError(t, err)
+		assert.Equal(t, Env.TestData.UserEmail, result.Email)
+	})
+}

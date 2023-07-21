@@ -47,7 +47,7 @@ func (client *Client) OpenCases() (cases []OpenCase, err error) {
 	q := SOQL().
 		Select("Id", "Subject", "OwnerId").
 		From("Case").
-		Where("IsClosed", "=", false).
+		Where("IsClosed", EQUALS, false).
 		Limit(200)
 	res, err := sc.Query(q)
 	if err != nil {
@@ -63,7 +63,7 @@ func (client *Client) UserName(id string) (name string, err error) {
 	q := SOQL().
 		Select("Id", "Name").
 		From("User").
-		Where("Id", "=", id).
+		Where("Id", EQUALS, id).
 		Limit(1)
 	user, err := sc.Query(q)
 	if err != nil {
@@ -83,7 +83,7 @@ func (client *Client) GroupName(id string) (name string, err error) {
 	q := SOQL().
 		Select("Id", "Name").
 		From("Group").
-		Where("Id", "=", id).
+		Where("Id", EQUALS, id).
 		Limit(1)
 	group, err := sc.Query(q)
 	if err != nil {
@@ -103,7 +103,7 @@ func (client *Client) AccountIDFromName(name string) (id string, err error) {
 	q := SOQL().
 		Select("Id", "Name").
 		From("Account").
-		Where("Name", "=", name).
+		Where("Name", EQUALS, name).
 		Limit(1)
 	account, err := sc.Query(q)
 	if err != nil {
@@ -138,10 +138,7 @@ func (client *Client) CaseByNumber(caseNumber string) (result *Case, err error) 
 	if err != nil {
 		return
 	}
-	query := SOQL().Select("Id").From("Case").Where("CaseNumber", "=", caseNumber)
-	if err != nil {
-		return
-	}
+	query := SOQL().Select("Id").From("Case").Where("CaseNumber", EQUALS, caseNumber)
 	sc := NewSOQL[ObjectID](client)
 	queryResult, err := sc.Query(query)
 	if err != nil {
@@ -153,5 +150,25 @@ func (client *Client) CaseByNumber(caseNumber string) (result *Case, err error) 
 	}
 	caseID := queryResult.Records[0].ID
 	result, err = client.Case(caseID)
+	return
+}
+
+// Retrieve a user by its email address.
+func (client *Client) UserByEmail(email string) (user *User, err error) {
+	err = client.prepare()
+	if err != nil {
+		return
+	}
+	query := SOQL().Select("Id").From("User").Where("Email", EQUALS, email)
+	sc := NewSOQL[ObjectID](client)
+	res, err := sc.Query(query)
+	if err != nil {
+		return
+	}
+	if len(res.Records) == 0 {
+		err = fmt.Errorf("user with email '%s' not found", email)
+		return
+	}
+	user, err = client.User(res.Records[0].ID)
 	return
 }

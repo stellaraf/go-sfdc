@@ -9,6 +9,7 @@ type TestData struct {
 	ContactID             string `json:"contactId"`
 	AccountCustomFieldKey string `json:"accountCustomFieldKey"`
 	CaseCustomFieldKey    string `json:"caseCustomFieldKey"`
+	UserEmail             string `json:"userEmail"`
 }
 
 type Environment struct {

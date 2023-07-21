@@ -225,8 +225,12 @@ type Case struct {
 }
 
 type FeedItemOptions struct {
+	// ID of the user that posts the feed item.
+	CreatedByID string `json:"CreatedById,omitempty"`
 	// ID of whatever this is attached to (most likely, the case ID).
 	ParentID string `json:"ParentId,omitempty"`
+	// Title of the feed item.
+	Title string `json:"Title,omitempty"`
 	// Body - required if Type is TextPost.
 	Body string `json:"Body,omitempty"`
 	// Temporarily only supporting "TextPost".
