@@ -2,6 +2,7 @@ package sfdc
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 
 type where struct {
 	Key      string
-	Operator string
+	Operator SOQLOperator
 	Value    string
 }
 
@@ -22,7 +23,25 @@ type soql struct {
 	_groupBy string
 	_count   string
 	_limit   int
+	_errors  []error
 }
+
+type SOQLOperator string
+
+const IN SOQLOperator = "IN"
+const NOT_IN SOQLOperator = "NOT IN"
+const CONTAINS SOQLOperator = "CONTAINS"
+const STARTS_WITH SOQLOperator = "STARTS WITH"
+const ENDS_WITH SOQLOperator = "ENDS WITH"
+const LIKE SOQLOperator = "LIKE"
+const EQUALS SOQLOperator = "="
+const NOT_EQUALS SOQLOperator = "!="
+const GREATER_THAN SOQLOperator = ">"
+const LESS_THAN SOQLOperator = "<"
+const GEQUAL SOQLOperator = ">="
+const LEQUAL SOQLOperator = "<="
+const INCLUDES SOQLOperator = "INCLUDES"
+const EXCLUDES SOQLOperator = "EXCLUDES"
 
 // Create a (limited, for now) SOQL queries using a Go API.
 func SOQL() *soql {
@@ -48,49 +67,112 @@ func (s *soql) From(from string) *soql {
 	return s
 }
 
+func sliceType[T comparable](value any) ([]T, bool) {
+	v, ok := value.([]T)
+	return v, ok
+}
+
 // SOQL 'WHERE' function.
-func (s *soql) Where(key string, operator string, value interface{}) *soql {
+func (s *soql) Where(key string, operator SOQLOperator, value interface{}) *soql {
 	var _where where
-	if utils.IsSlice(value) {
-		va := value.([]interface{})
-		k := va[0].(string)
-		op := va[1]
-		val := va[2]
-		var values []string
-		if utils.IsSlice(val) {
-			for _, v := range val.([]interface{}) {
-				values = append(values, fmt.Sprintf("'%v'", v))
+	if (operator == IN || operator == NOT_IN) && utils.IsSlice(value) {
+		values := []string{}
+		s_str, is_str := sliceType[string](value)
+		s_int, is_int := sliceType[int](value)
+		s_int8, is_int8 := sliceType[int8](value)
+		s_int16, is_int16 := sliceType[int16](value)
+		s_int32, is_int32 := sliceType[int32](value)
+		s_int64, is_int64 := sliceType[int64](value)
+		s_uint, is_uint := sliceType[uint](value)
+		s_uint8, is_uint8 := sliceType[uint8](value)
+		s_uint16, is_uint16 := sliceType[uint16](value)
+		s_uint32, is_uint32 := sliceType[uint32](value)
+		s_uint64, is_uint64 := sliceType[uint64](value)
+		s_float32, is_float32 := sliceType[float32](value)
+		s_float64, is_float64 := sliceType[float64](value)
+		switch {
+		case is_str:
+			for _, s := range s_str {
+				values = append(values, fmt.Sprintf("'%s'", util.EscapeString(s)))
 			}
-		} else {
-			values = append(values, fmt.Sprintf("'%v'", val))
+		case is_int:
+			for _, i := range s_int {
+				values = append(values, fmt.Sprintf("'%d',", i))
+			}
+		case is_int8:
+			for _, i := range s_int8 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_int16:
+			for _, i := range s_int16 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_int32:
+			for _, i := range s_int32 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_int64:
+			for _, i := range s_int64 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_uint:
+			for _, i := range s_uint {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_uint8:
+			for _, i := range s_uint8 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_uint16:
+			for _, i := range s_uint16 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_uint32:
+			for _, i := range s_uint32 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_uint64:
+			for _, i := range s_uint64 {
+				values = append(values, fmt.Sprintf("'%d'", i))
+			}
+		case is_float32:
+			for _, i := range s_float32 {
+				values = append(values, fmt.Sprintf("'%.9f'", i))
+			}
+		case is_float64:
+			for _, i := range s_float64 {
+				values = append(values, fmt.Sprintf("'%.9f'", i))
+			}
+		default:
+			t := reflect.TypeOf(value).Kind().String()
+			s._errors = append(s._errors, fmt.Errorf("failed to determine type for value '%v' (type %s)", value, t))
 		}
-		valuesStr := fmt.Sprintf("(%s)", strings.Join(values, ", "))
-		valuesStr = util.EscapeString(valuesStr)
-		if op == "notin" {
-			_where = where{Key: k, Operator: "NOT IN", Value: valuesStr}
+		valuesStr := fmt.Sprintf("(%s)", strings.Join(values, ","))
+		if operator == NOT_IN {
+			_where = where{Key: key, Operator: NOT_IN, Value: valuesStr}
 		} else {
-			_where = where{Key: k, Operator: "IN", Value: valuesStr}
+			_where = where{Key: key, Operator: IN, Value: valuesStr}
 		}
 	} else {
 		switch operator {
-		case "contains":
+		case CONTAINS:
 			val := fmt.Sprintf("'%%%v%%'", value)
-			_where = where{Key: key, Operator: "LIKE", Value: val}
-		case "startswith":
+			_where = where{Key: key, Operator: LIKE, Value: val}
+		case STARTS_WITH:
 			val := fmt.Sprintf("'%v%%'", value)
-			_where = where{Key: key, Operator: "LIKE", Value: val}
-		case "endswith":
+			_where = where{Key: key, Operator: LIKE, Value: val}
+		case ENDS_WITH:
 			val := fmt.Sprintf("'%%%v'", value)
-			_where = where{Key: key, Operator: "LIKE", Value: val}
+			_where = where{Key: key, Operator: LIKE, Value: val}
 		default:
 			if utils.IsTime(value) {
 				val := value.(time.Time)
 				_where = where{Key: key, Operator: operator, Value: val.Format(time.RFC3339)}
 			} else if utils.IsString(value) {
 				val := util.EscapeString(value.(string))
-				_where = where{Key: key, Operator: operator, Value: fmt.Sprintf("'%v'", val)}
+				_where = where{Key: key, Operator: operator, Value: fmt.Sprintf("'%s'", val)}
 			} else {
-				_where = where{Key: key, Operator: operator, Value: fmt.Sprintf("%v", value)}
+				_where = where{Key: key, Operator: operator, Value: fmt.Sprint(value)}
 			}
 		}
 	}
@@ -126,13 +208,17 @@ func (s *soql) String() (result string, err error) {
 		err = fmt.Errorf("'SELECT' is required for SOQL queries")
 		return
 	}
+	for _, e := range s._errors {
+		err = e
+		return
+	}
 	_select := strings.Join(s._select, ",")
 	parts := []string{fmt.Sprintf("SELECT %s", _select), fmt.Sprintf("FROM %s", s._from)}
 
 	if len(s._where) > 0 {
 		var filters []string
 		for _, w := range s._where {
-			statement := strings.Join([]string{w.Key, w.Operator, w.Value}, " ")
+			statement := strings.Join([]string{w.Key, string(w.Operator), w.Value}, " ")
 			filters = append(filters, statement)
 		}
 		_where := fmt.Sprintf("WHERE %s", strings.Join(filters, " AND "))
