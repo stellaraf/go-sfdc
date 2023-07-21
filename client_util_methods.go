@@ -1,6 +1,7 @@
 package sfdc
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -29,6 +30,10 @@ func (client *Client) handleResponse(res *resty.Response, obj any) (err error) {
 	s := p.Elem()
 	body := res.Body()
 	extra, err := marshmallow.Unmarshal(body, obj)
+	if err != nil {
+		err = errors.Join(err, fmt.Errorf("failed to parse response body '%s'", string(body)))
+		return
+	}
 	f := s.FieldByName("CustomFields")
 	e := reflect.ValueOf(extra)
 	if f.CanSet() {
