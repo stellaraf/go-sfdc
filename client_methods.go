@@ -7,7 +7,7 @@ func (client *Client) CloseCase(caseID string) (err error) {
 	if err != nil {
 		return
 	}
-	err = client.UpdateCase(caseID, &CaseUpdate{Status: "Closed"})
+	err = client.UpdateCase(caseID, &CaseUpdate{Status: "Closed", SkipAutoAssign: true})
 	return
 }
 
