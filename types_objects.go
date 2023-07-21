@@ -122,14 +122,15 @@ type Account struct {
 	ConnectionReceivedID    string       `json:"ConnectionReceivedId,omitempty"`
 	Description             string       `json:"Description,omitempty"`
 	Industry                string       `json:"Industry,omitempty"`
+	IsCustomerPortal        bool         `json:"IsCustomerPortal"`
 	IsDeleted               bool         `json:"IsDeleted,omitempty"`
 	Jigsaw                  string       `json:"Jigsaw,omitempty"`
 	JigsawCompanyID         string       `json:"JigsawCompanyId,omitempty"`
-	LastReferencedDate      string       `json:"LastReferencedDate"`
+	LastReferencedDate      string       `json:"LastReferencedDate,omitempty"`
 	LastViewedDate          string       `json:"LastViewedDate,omitempty"`
 	MasterRecordID          string       `json:"MasterRecordId,omitempty"`
 	Name                    string       `json:"Name"`
-	NumberOfEmployees       string       `json:"NumberOfEmployees,omitempty"`
+	NumberOfEmployees       int          `json:"NumberOfEmployees,omitempty"`
 	ParentID                string       `json:"ParentId,omitempty"`
 	Phone                   string       `json:"Phone,omitempty"`
 	PhotoUrl                string       `json:"PhotoUrl,omitempty"`
