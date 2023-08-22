@@ -24,6 +24,9 @@ type soql struct {
 	_count   string
 	_limit   int
 	_errors  []error
+	_sort    string
+	_order   int
+	_nulls   int
 }
 
 type SOQLOperator string
@@ -43,6 +46,16 @@ const LEQUAL SOQLOperator = "<="
 const INCLUDES SOQLOperator = "INCLUDES"
 const EXCLUDES SOQLOperator = "EXCLUDES"
 
+const (
+	ascending = iota
+	descending
+)
+
+const (
+	nullsFirst = iota
+	nullsLast
+)
+
 // Create a (limited, for now) SOQL queries using a Go API.
 func SOQL() *soql {
 	return &soql{
@@ -52,6 +65,9 @@ func SOQL() *soql {
 		_groupBy: "",
 		_count:   "",
 		_limit:   -1,
+		_sort:    "",
+		_order:   ascending,
+		_nulls:   nullsFirst,
 	}
 }
 
@@ -198,6 +214,36 @@ func (s *soql) Limit(limit int) *soql {
 	return s
 }
 
+// SOQL 'SORT' function.
+func (s *soql) Sort(field string) *soql {
+	s._sort = field
+	return s
+}
+
+// In conjunction with Sort(), order results A-Z.
+func (s *soql) Ascending() *soql {
+	s._order = ascending
+	return s
+}
+
+// In conjunction with Sort(), order results Z-A.
+func (s *soql) Descending() *soql {
+	s._order = descending
+	return s
+}
+
+// In conjunction with Sort(), place null results first.
+func (s *soql) NullsFirst() *soql {
+	s._nulls = nullsFirst
+	return s
+}
+
+// In conjunction with Sort(), place null results last.
+func (s *soql) NullsLast() *soql {
+	s._nulls = nullsLast
+	return s
+}
+
 // Convert the SOQL query object to an SOQL query string.
 func (s *soql) String() (result string, err error) {
 	if s._from == "" {
@@ -238,10 +284,26 @@ func (s *soql) String() (result string, err error) {
 		parts = append(parts, rest...)
 	}
 
+	if s._sort != "" {
+		_sort := fmt.Sprintf("ORDER BY %s", s._sort)
+		parts = append(parts, _sort)
+		if s._order == ascending {
+			parts = append(parts, "ASC")
+		} else if s._order == descending {
+			parts = append(parts, "DESC")
+		}
+		if s._nulls == nullsFirst {
+			parts = append(parts, "NULLS FIRST")
+		} else if s._nulls == nullsLast {
+			parts = append(parts, "NULLS LAST")
+		}
+	}
+
 	if s._limit != -1 {
 		_limit := fmt.Sprintf("LIMIT %d", s._limit)
 		parts = append(parts, _limit)
 	}
+
 	result = strings.Join(parts, " ")
 	return
 }
