@@ -266,3 +266,25 @@ func (client *Client) FeedItem(id string) (result *FeedItem, err error) {
 	result = res.Result().(*FeedItem)
 	return
 }
+
+func (client *Client) CreateFeedItem(data *FeedItemOptions) (*RecordCreatedResponse, error) {
+	err := client.prepare()
+	if err != nil {
+		return nil, err
+	}
+	basePath, err := getPath("feed_item")
+	if err != nil {
+		return nil, err
+	}
+	req := client.httpClient.R().SetResult(&RecordCreatedResponse{}).SetError(SalesforceErrorResponse{}).SetBody(data)
+	res, err := req.Post(basePath)
+	if err != nil {
+		return nil, err
+	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return nil, err
+	}
+	result := res.Result().(*RecordCreatedResponse)
+	return result, nil
+}

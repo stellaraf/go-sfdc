@@ -5,6 +5,7 @@ import (
 
 	"github.com/stellaraf/go-sfdc"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_PostToCase(t *testing.T) {
@@ -22,9 +23,9 @@ func Test_PostToCase(t *testing.T) {
 	t.Run("post plain text update", func(t *testing.T) {
 		t.Parallel()
 		postResult, err := Client.PostToCase(newCase.ID, "go-sfdc test plain text comment", nil)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		feedItem, err := Client.FeedItem(postResult.ID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.True(t, postResult.Success)
 		assert.Equal(t, postResult.ID, feedItem.ID)
 		assert.Greater(t, len(postResult.ID), 1)
@@ -35,9 +36,9 @@ func Test_PostToCase(t *testing.T) {
 		postResult, err := Client.PostToCase(newCase.ID, body, &sfdc.FeedItemOptions{
 			IsRichText: true,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		feedItem, err := Client.FeedItem(postResult.ID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.True(t, postResult.Success)
 		assert.Equal(t, postResult.ID, feedItem.ID)
 		assert.Greater(t, len(postResult.ID), 1)
@@ -63,11 +64,11 @@ func Test_CloseCase(t *testing.T) {
 			Subject:     subject,
 		}
 		newCase, err := Client.CreateCase(caseData)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		err = Client.CloseCase(newCase.ID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		closedCase, err := Client.Case(newCase.ID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "Closed", closedCase.Status)
 	})
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/stellaraf/go-sfdc"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Time(t *testing.T) {
@@ -18,7 +19,7 @@ func Test_Time(t *testing.T) {
 	t.Run("unmarshal", func(t *testing.T) {
 		var s *Struct
 		err := json.Unmarshal(data, &s)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, rfc3339, s.Timestamp.Format(time.RFC3339))
 	})
 }

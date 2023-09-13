@@ -8,6 +8,7 @@ import (
 	"github.com/stellaraf/go-sfdc"
 	"github.com/stellaraf/go-sfdc/internal/env"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func setupAuth() (
@@ -76,17 +77,17 @@ func initAuth() (auth *sfdc.Auth, err error) {
 func Test_Auth(t *testing.T) {
 	t.Run("get an access token", func(t *testing.T) {
 		auth, err := initAuth()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		token, err := auth.GetNewToken()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotEqual(t, "", token.AccessToken)
 	})
 
 	t.Run("test auth errors", func(t *testing.T) {
 		env, err := env.LoadEnv()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setupAuth()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		_, err = sfdc.NewAuth(
 			"invalid-client-key",
 			env.PrivateKey,
