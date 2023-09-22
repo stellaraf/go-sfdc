@@ -14,8 +14,6 @@ import (
 func setupAuth() (
 	getAccessTokenCallback sfdc.CachedTokenCallback,
 	setAccessTokenCallback sfdc.SetTokenCallback,
-	getRefreshTokenCallback sfdc.CachedTokenCallback,
-	setRefreshTokenCallback sfdc.SetTokenCallback,
 	err error) {
 	cache := cache2go.Cache("go-sfdc-test")
 	cache.Flush()
@@ -28,23 +26,11 @@ func setupAuth() (
 		return token, nil
 	}
 
-	setAccessToken := func(token string, expiresIn float64) error {
-		cache.Add("access-token", time.Duration(expiresIn), token)
+	setAccessToken := func(token string, expiresIn time.Duration) error {
+		cache.Add("access-token", expiresIn, token)
 		return nil
 	}
-	getRefreshToken := func() (string, error) {
-		res, err := cache.Value("refresh-token")
-		if err != nil {
-			return "", nil
-		}
-		token := res.Data().(string)
-		return token, nil
-	}
-	setRefreshToken := func(token string, expiresIn float64) error {
-		cache.Add("refresh-token", time.Duration(expiresIn), token)
-		return nil
-	}
-	return getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, nil
+	return getAccessToken, setAccessToken, nil
 }
 
 func initAuth() (auth *sfdc.Auth, err error) {
@@ -52,7 +38,7 @@ func initAuth() (auth *sfdc.Auth, err error) {
 	if err != nil {
 		return
 	}
-	getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setup()
+	getAccessToken, setAccessToken, err := setup()
 	if err != nil {
 		return
 	}
@@ -68,8 +54,6 @@ func initAuth() (auth *sfdc.Auth, err error) {
 		encryptionPassphrase,
 		getAccessToken,
 		setAccessToken,
-		getRefreshToken,
-		setRefreshToken,
 	)
 	return
 }
@@ -86,7 +70,7 @@ func Test_Auth(t *testing.T) {
 	t.Run("test auth errors", func(t *testing.T) {
 		env, err := env.LoadEnv()
 		require.NoError(t, err)
-		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setupAuth()
+		getAccessToken, setAccessToken, err := setupAuth()
 		require.NoError(t, err)
 		_, err = sfdc.NewAuth(
 			"invalid-client-key",
@@ -96,8 +80,6 @@ func Test_Auth(t *testing.T) {
 			nil,
 			getAccessToken,
 			setAccessToken,
-			getRefreshToken,
-			setRefreshToken,
 		)
 		assert.ErrorContains(t, err, "client identifier invalid")
 	})

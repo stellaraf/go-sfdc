@@ -7,7 +7,7 @@ import (
 
 type CachedTokenCallback func() (string, error)
 
-type SetTokenCallback func(token string, expiresIn float64) error
+type SetTokenCallback func(token string, expiresIn time.Duration) error
 
 type Token struct {
 	ID          string    `json:"id"`

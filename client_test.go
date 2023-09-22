@@ -13,12 +13,7 @@ import (
 var Client *sfdc.Client
 var Env env.Environment
 
-func setup() (
-	getAccessTokenCallback sfdc.CachedTokenCallback,
-	setAccessTokenCallback sfdc.SetTokenCallback,
-	getRefreshTokenCallback sfdc.CachedTokenCallback,
-	setRefreshTokenCallback sfdc.SetTokenCallback,
-	err error) {
+func setup() (getAccessTokenCallback sfdc.CachedTokenCallback, setAccessTokenCallback sfdc.SetTokenCallback, err error) {
 	cache := cache2go.Cache("go-sfdc-test")
 	cache.Flush()
 	getAccessToken := func() (string, error) {
@@ -30,23 +25,11 @@ func setup() (
 		return token, nil
 	}
 
-	setAccessToken := func(token string, expiresIn float64) error {
-		cache.Add("access-token", time.Duration(expiresIn), token)
+	setAccessToken := func(token string, expiresIn time.Duration) error {
+		cache.Add("access-token", expiresIn, token)
 		return nil
 	}
-	getRefreshToken := func() (string, error) {
-		res, err := cache.Value("refresh-token")
-		if err != nil {
-			return "", nil
-		}
-		token := res.Data().(string)
-		return token, nil
-	}
-	setRefreshToken := func(token string, expiresIn float64) error {
-		cache.Add("refresh-token", time.Duration(expiresIn), token)
-		return nil
-	}
-	return getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, nil
+	return getAccessToken, setAccessToken, nil
 }
 
 func initClient() (client *sfdc.Client, e env.Environment, err error) {
@@ -54,7 +37,7 @@ func initClient() (client *sfdc.Client, e env.Environment, err error) {
 	if err != nil {
 		return
 	}
-	getAccessToken, setAccessToken, getRefreshToken, setRefreshToken, err := setup()
+	getAccessToken, setAccessToken, err := setup()
 	if err != nil {
 		return
 	}
@@ -65,7 +48,7 @@ func initClient() (client *sfdc.Client, e env.Environment, err error) {
 	client, err = sfdc.New(
 		e.ClientID, e.PrivateKey, e.AuthUsername, e.AuthURL,
 		encryptionPassphrase,
-		getAccessToken, setAccessToken, getRefreshToken, setRefreshToken,
+		getAccessToken, setAccessToken,
 	)
 	return
 }

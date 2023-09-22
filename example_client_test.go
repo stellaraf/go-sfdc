@@ -23,23 +23,8 @@ func ExampleNew() {
 	}
 
 	// Define a callback function to add the Salesforce OAuth2 access token from the cache.
-	setAccessToken := func(token string, expiresIn float64) error {
-		cache.Add("access-token", time.Duration(expiresIn), token)
-		return nil
-	}
-
-	// Define a callback function to retrieve the Salesforce OAuth2 refresh token from the cache.
-	getRefreshToken := func() (string, error) {
-		res, err := cache.Value("refresh-token")
-		if err != nil {
-			return "", nil
-		}
-		token := res.Data().(string)
-		return token, nil
-	}
-	// Define a callback function to add the Salesforce OAuth2 refresh token from the cache.
-	setRefreshToken := func(token string, expiresIn float64) error {
-		cache.Add("refresh-token", time.Duration(expiresIn), token)
+	setAccessToken := func(token string, expiresIn time.Duration) error {
+		cache.Add("access-token", expiresIn, token)
 		return nil
 	}
 
@@ -74,8 +59,6 @@ func ExampleNew() {
 		encryptionPassphrase,
 		getAccessToken,
 		setAccessToken,
-		getRefreshToken,
-		setRefreshToken,
 	)
 	if err != nil {
 		// handle error

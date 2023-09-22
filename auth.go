@@ -16,18 +16,16 @@ import (
 const GRANT_TYPE_JWT_BEARER string = "urn:ietf:params:oauth:grant-type:jwt-bearer"
 
 type Auth struct {
-	InstanceURL             *url.URL
-	privateKey              string
-	clientID                string
-	username                string
-	httpClient              *resty.Client
-	authURL                 *url.URL
-	encryption              bool
-	encryptionPassphrase    string
-	getAccessTokenCallback  CachedTokenCallback
-	setAccessTokenCallback  SetTokenCallback
-	getRefreshTokenCallback CachedTokenCallback
-	setRefreshTokenCallback SetTokenCallback
+	InstanceURL            *url.URL
+	privateKey             string
+	clientID               string
+	username               string
+	httpClient             *resty.Client
+	authURL                *url.URL
+	encryption             bool
+	encryptionPassphrase   string
+	getAccessTokenCallback CachedTokenCallback
+	setAccessTokenCallback SetTokenCallback
 }
 
 func parsePrivateKey(key []byte) (parsed any, err error) {
@@ -130,17 +128,17 @@ func (auth *Auth) GetAccessToken() (token string, err error) {
 }
 
 func (auth *Auth) SetAccessToken(token *Token) (err error) {
-	expSeconds := token.ExpiresAt.Unix() / 1000
+	exp := time.Until(token.ExpiresAt)
 	if auth.encryption {
 		var encrypted string
 		encrypted, err = encryption.Encrypt(token.AccessToken, auth.encryptionPassphrase)
 		if err != nil {
 			return
 		}
-		auth.setAccessTokenCallback(encrypted, float64(expSeconds))
+		auth.setAccessTokenCallback(encrypted, exp)
 		return
 	}
-	auth.setAccessTokenCallback(token.AccessToken, float64(expSeconds))
+	auth.setAccessTokenCallback(token.AccessToken, exp)
 	return
 }
 
@@ -157,8 +155,6 @@ func NewAuth(
 	encryption *string,
 	getAccessTokenCallback CachedTokenCallback,
 	setAccessTokenCallback SetTokenCallback,
-	getRefreshTokenCallback CachedTokenCallback,
-	setRefreshTokenCallback SetTokenCallback,
 ) (auth *Auth, err error) {
 	// parse auth base URL and set base URL of http client
 	var doEncrypt bool
@@ -178,18 +174,16 @@ func NewAuth(
 	httpClient.SetBaseURL(fmt.Sprintf("%s://%s", parsedAuthURL.Scheme, parsedAuthURL.Host))
 	key := util.FormatPrivateKey(privateKey)
 	auth = &Auth{
-		InstanceURL:             nil,
-		authURL:                 parsedAuthURL,
-		username:                username,
-		clientID:                clientID,
-		privateKey:              key,
-		encryption:              doEncrypt,
-		encryptionPassphrase:    passphrase,
-		getAccessTokenCallback:  getAccessTokenCallback,
-		setAccessTokenCallback:  setAccessTokenCallback,
-		getRefreshTokenCallback: getRefreshTokenCallback,
-		setRefreshTokenCallback: setRefreshTokenCallback,
-		httpClient:              httpClient,
+		InstanceURL:            nil,
+		authURL:                parsedAuthURL,
+		username:               username,
+		clientID:               clientID,
+		privateKey:             key,
+		encryption:             doEncrypt,
+		encryptionPassphrase:   passphrase,
+		getAccessTokenCallback: getAccessTokenCallback,
+		setAccessTokenCallback: setAccessTokenCallback,
+		httpClient:             httpClient,
 	}
 	token, err := auth.GetNewToken()
 	if err != nil {

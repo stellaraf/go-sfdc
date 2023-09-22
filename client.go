@@ -25,8 +25,6 @@ func New(
 	encryption *string,
 	getAccessTokenCallback CachedTokenCallback,
 	setAccessTokenCallback SetTokenCallback,
-	getRefreshTokenCallback CachedTokenCallback,
-	setRefreshTokenCallback SetTokenCallback,
 ) (client *Client, err error) {
 
 	auth, err := NewAuth(
@@ -34,8 +32,6 @@ func New(
 		encryption,
 		getAccessTokenCallback,
 		setAccessTokenCallback,
-		getRefreshTokenCallback,
-		setRefreshTokenCallback,
 	)
 	if err != nil {
 		return
