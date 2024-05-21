@@ -76,29 +76,29 @@ func loadDotEnv() (err error) {
 	return
 }
 
-func LoadEnv() (env Environment, err error) {
-	err = loadDotEnv()
+func LoadEnv() (Environment, error) {
+	err := loadDotEnv()
 	if err != nil {
-		return
+		return Environment{}, err
 	}
 	clientId := os.Getenv("SFDC_CLIENT_ID")
-	privateKey := os.Getenv("SFDC_PRIVATE_KEY")
+	clientSecret := os.Getenv("SFDC_CLIENT_SECRET")
 	encryptionPassphrase := os.Getenv("SFDC_ENCRYPTION_PASSPHRASE")
 	authURL := os.Getenv("SFDC_AUTH_URL")
-	authUsername := os.Getenv("SFDC_AUTH_USERNAME")
 	testDataRaw := os.Getenv("SFDC_TEST_DATA")
+
 	var testData TestData
 	err = json.Unmarshal([]byte(testDataRaw), &testData)
 	if err != nil {
-		return
+		return Environment{}, err
 	}
-	env = Environment{
+
+	env := Environment{
 		ClientID:             clientId,
+		ClientSecret:         clientSecret,
 		EncryptionPassphrase: encryptionPassphrase,
-		PrivateKey:           privateKey,
 		AuthURL:              authURL,
-		AuthUsername:         authUsername,
 		TestData:             testData,
 	}
-	return
+	return env, nil
 }

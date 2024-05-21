@@ -3,8 +3,8 @@ module github.com/stellaraf/go-sfdc
 go 1.20
 
 require (
+	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/muesli/cache2go v0.0.0-20221011235721-518229cd8021
 	github.com/perimeterx/marshmallow v1.1.5

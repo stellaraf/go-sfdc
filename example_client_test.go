@@ -31,8 +31,8 @@ func ExampleNew() {
 	// Salesforce Connected App OAuth2 Client ID.
 	clientID := "abcdef1234567890"
 
-	// Provide the private key used for the Salesforce Connected App.
-	privateKey := "<private key>"
+	// Salesforce Connected App OAuth2 Client Secret.
+	clientSecret := "0987654321fedcba"
 
 	// If set, the encryption passphrase is used to encrypt all values written to the cache
 	// using AES-256-GCM encryption.
@@ -47,14 +47,9 @@ func ExampleNew() {
 	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm
 	authURL := "https://login.salesforce.com"
 
-	// Username with which go-sfdc will authenticate to the Salesforce API.
-	// See: https://help.salesforce.com/s/articleView?id=sf.remoteaccess_oauth_jwt_flow.htm
-	username := "user@example.com"
-
 	client, err := sfdc.New(
 		clientID,
-		privateKey,
-		username,
+		clientSecret,
 		authURL,
 		encryptionPassphrase,
 		getAccessToken,

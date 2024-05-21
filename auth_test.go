@@ -48,8 +48,7 @@ func initAuth() (auth *sfdc.Auth, err error) {
 	}
 	auth, err = sfdc.NewAuth(
 		env.ClientID,
-		env.PrivateKey,
-		env.AuthUsername,
+		env.ClientSecret,
 		env.AuthURL,
 		encryptionPassphrase,
 		getAccessToken,
@@ -74,8 +73,7 @@ func Test_Auth(t *testing.T) {
 		require.NoError(t, err)
 		_, err = sfdc.NewAuth(
 			"invalid-client-key",
-			env.PrivateKey,
-			env.AuthUsername,
+			env.ClientSecret,
 			env.AuthURL,
 			nil,
 			getAccessToken,

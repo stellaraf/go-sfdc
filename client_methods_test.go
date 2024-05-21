@@ -19,7 +19,9 @@ func Test_PostToCase(t *testing.T) {
 		Status:      "New",
 		Subject:     subject,
 	}
-	newCase, _ := Client.CreateCase(caseData)
+	newCase, err := Client.CreateCase(caseData)
+	require.NoError(t, err)
+	require.NotNil(t, newCase)
 	t.Run("post plain text update", func(t *testing.T) {
 		t.Parallel()
 		postResult, err := Client.PostToCase(newCase.ID, "go-sfdc test plain text comment", nil)

@@ -10,12 +10,35 @@ type CachedTokenCallback func() (string, error)
 type SetTokenCallback func(token string, expiresIn time.Duration) error
 
 type Token struct {
-	ID          string    `json:"id"`
-	Scope       string    `json:"scope"`
-	TokenType   string    `json:"token_type"`
-	AccessToken string    `json:"access_token"`
-	InstanceURL string    `json:"instance_url"`
-	ExpiresAt   time.Time `json:"expiresAt"`
+	ID          string `json:"id"`
+	Scope       string `json:"scope"`
+	TokenType   string `json:"token_type"`
+	AccessToken string `json:"access_token"`
+	InstanceURL string `json:"instance_url"`
+	IssuedAt    string `json:"issued_at"`
+	Signature   string `json:"signature"`
+	expiresAt   time.Time
+}
+
+func (token *Token) SetExpiry(exp int) *Token {
+	token.expiresAt = time.Unix(0, int64(exp)*int64(time.Millisecond))
+	return token
+}
+
+func (token *Token) IsExpired() bool {
+	return time.Now().After(token.expiresAt)
+}
+
+type TokenIntrospection struct {
+	Active    bool   `json:"active"`
+	Scope     string `json:"scope"`
+	ClientID  string `json:"client_id"`
+	Username  string `json:"username"`
+	Sub       string `json:"sub"`
+	TokenType string `json:"token_type"`
+	Exp       int    `json:"exp"`
+	Iat       int    `json:"iat"`
+	Nbf       int    `json:"nbf"`
 }
 
 type JWTClaim struct {

@@ -28,7 +28,7 @@ func (soqlClient *SOQLClient[T]) Query(soqlQuery *soql) (results RecordResponse[
 		SetResult(RecordResponse[T]{}).
 		SetError(SalesforceErrorResponse{})
 
-	res, err := req.Get(path)
+	res, err := soqlClient.Do(req.Get, path)
 	if err != nil {
 		return
 	}

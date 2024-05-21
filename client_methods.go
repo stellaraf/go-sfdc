@@ -28,7 +28,7 @@ func (client *Client) PostToCase(caseID string, content string, feedOptions *Fee
 	feedOptions.Body = content
 	feedOptions.Type = "TextPost"
 	req := client.httpClient.R().SetBody(feedOptions).SetResult(&RecordCreatedResponse{})
-	res, err := req.Post(path)
+	res, err := client.Do(req.Post, path)
 	if err != nil {
 		return
 	}

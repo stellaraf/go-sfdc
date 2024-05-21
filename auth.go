@@ -1,25 +1,18 @@
 package sfdc
 
 import (
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"net/url"
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/stellaraf/go-sfdc/internal/util"
 	"github.com/stellaraf/go-utils/encryption"
 )
 
-const GRANT_TYPE_JWT_BEARER string = "urn:ietf:params:oauth:grant-type:jwt-bearer"
-
 type Auth struct {
 	InstanceURL            *url.URL
-	privateKey             string
+	clientSecret           string
 	clientID               string
-	username               string
 	httpClient             *resty.Client
 	authURL                *url.URL
 	encryption             bool
@@ -28,65 +21,57 @@ type Auth struct {
 	setAccessTokenCallback SetTokenCallback
 }
 
-func parsePrivateKey(key []byte) (parsed any, err error) {
-	parsed, err = x509.ParsePKCS8PrivateKey(key)
+func (auth *Auth) IntrospectToken(token string) (*TokenIntrospection, error) {
+	data := map[string]string{
+		"client_id":       auth.clientID,
+		"client_secret":   auth.clientSecret,
+		"token_type_hint": "access_token",
+		"token":           token,
+	}
+	req := auth.httpClient.R().
+		SetFormData(data).
+		SetResult(&TokenIntrospection{}).
+		SetError(&AuthErrorResponse{})
+	res, err := req.Post("/services/oauth2/introspect")
 	if err != nil {
-		parsed, err = x509.ParsePKCS1PrivateKey(key)
-		if err != nil {
-			parsed, err = x509.ParseECPrivateKey(key)
-			if err != nil {
-				return
-			}
+		return nil, err
+	}
+	if res.IsError() {
+		err = getSFDCError(res.Error())
+		return nil, err
+	}
+
+	intro, ok := res.Result().(*TokenIntrospection)
+	if !ok {
+		detail := string(res.Body())
+		m := "failed to introspect access token"
+		if detail != "" {
+			m += fmt.Sprintf(" due to error: %s", detail)
 		}
+		err = fmt.Errorf(m)
+		return nil, err
 	}
-	if parsed == nil {
-		err = fmt.Errorf("failed to parse private key")
-		return
-	}
-	return
+	return intro, nil
 }
 
-func (auth *Auth) GetNewToken() (token *Token, err error) {
-	expiresAt := time.Now()
-	expiresAt = expiresAt.Add(time.Second * 300)
-	// SFDC requires that the audience be a single string, not an array.
-	jwt.MarshalSingleStringAsArray = false
-	claims := &jwt.RegisteredClaims{
-		Issuer:    auth.clientID,
-		Subject:   auth.username,
-		Audience:  jwt.ClaimStrings{auth.authURL.String()},
-		ExpiresAt: jwt.NewNumericDate(expiresAt),
-	}
-	initialToken := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	block, _ := pem.Decode([]byte(auth.privateKey))
-	if block == nil {
-		err = fmt.Errorf("failed to decode private key")
-		return
-	}
-	rsaKey, err := parsePrivateKey(block.Bytes)
-	if err != nil {
-		return
-	}
-	assertion, err := initialToken.SignedString(rsaKey)
-	if err != nil {
-		return
-	}
-
+func (auth *Auth) GetNewToken() (*Token, error) {
 	req := auth.httpClient.R().
-		SetHeader("content-type", "application/x-www-form-urlencoded").
-		SetQueryParam("grant_type", GRANT_TYPE_JWT_BEARER).
-		SetQueryParam("assertion", assertion).
+		SetQueryParam("grant_type", "client_credentials").
+		SetQueryParam("client_id", auth.clientID).
+		SetQueryParam("client_secret", auth.clientSecret).
 		SetResult(&Token{}).
 		SetError(&AuthErrorResponse{})
 
 	res, err := req.Post("/services/oauth2/token")
 	if err != nil {
-		return
+		return nil, err
 	}
+
 	if res.IsError() {
 		err = getSFDCError(res.Error())
-		return
+		return nil, err
 	}
+
 	token, ok := res.Result().(*Token)
 	if !ok {
 		detail := string(res.Body())
@@ -95,10 +80,17 @@ func (auth *Auth) GetNewToken() (token *Token, err error) {
 			m += fmt.Sprintf(" due to error: %s", detail)
 		}
 		err = fmt.Errorf(m)
-		return
+		return nil, err
 	}
-	token.ExpiresAt = expiresAt
-	return
+
+	intro, err := auth.IntrospectToken(token.AccessToken)
+	if err != nil {
+		return nil, err
+	}
+
+	token.SetExpiry(intro.Exp)
+
+	return token, nil
 }
 
 func (auth *Auth) GetAccessToken() (token string, err error) {
@@ -128,7 +120,7 @@ func (auth *Auth) GetAccessToken() (token string, err error) {
 }
 
 func (auth *Auth) SetAccessToken(token *Token) (err error) {
-	exp := time.Until(token.ExpiresAt)
+	exp := time.Until(token.expiresAt)
 	if auth.encryption {
 		var encrypted string
 		encrypted, err = encryption.Encrypt(token.AccessToken, auth.encryptionPassphrase)
@@ -151,7 +143,7 @@ func (auth *Auth) CacheNewToken(token *Token) (err error) {
 }
 
 func NewAuth(
-	clientID, privateKey, username, authURL string,
+	clientID, clientSecret, authURL string,
 	encryption *string,
 	getAccessTokenCallback CachedTokenCallback,
 	setAccessTokenCallback SetTokenCallback,
@@ -172,13 +164,11 @@ func NewAuth(
 	}
 	httpClient.SetHeader("user-agent", "go-sfdc")
 	httpClient.SetBaseURL(fmt.Sprintf("%s://%s", parsedAuthURL.Scheme, parsedAuthURL.Host))
-	key := util.FormatPrivateKey(privateKey)
 	auth = &Auth{
 		InstanceURL:            nil,
 		authURL:                parsedAuthURL,
-		username:               username,
 		clientID:               clientID,
-		privateKey:             key,
+		clientSecret:           clientSecret,
 		encryption:             doEncrypt,
 		encryptionPassphrase:   passphrase,
 		getAccessTokenCallback: getAccessTokenCallback,

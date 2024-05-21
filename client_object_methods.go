@@ -19,7 +19,7 @@ func (client *Client) Account(id string) (account *Account, err error) {
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
-	res, err := req.Get(path)
+	res, err := client.Do(req.Get, path)
 	if err != nil {
 		return
 	}
@@ -44,7 +44,7 @@ func (client *Client) User(id string) (user *User, err error) {
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
-	res, err := req.Get(path)
+	res, err := client.Do(req.Get, path)
 	if err != nil {
 		return
 	}
@@ -69,7 +69,7 @@ func (client *Client) Group(id string) (group *Group, err error) {
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
-	res, err := req.Get(path)
+	res, err := client.Do(req.Get, path)
 	if err != nil {
 		return
 	}
@@ -94,7 +94,7 @@ func (client *Client) Case(id string) (_case *Case, err error) {
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
-	res, err := req.Get(path)
+	res, err := client.Do(req.Get, path)
 	if err != nil {
 		return
 	}
@@ -119,7 +119,7 @@ func (client *Client) ServiceContract(id string) (contract *ServiceContract, err
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
-	res, err := req.Get(path)
+	res, err := client.Do(req.Get, path)
 	if err != nil {
 		return
 	}
@@ -144,7 +144,7 @@ func (client *Client) Contact(id string) (contact *Contact, err error) {
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R()
-	res, err := req.Get(path)
+	res, err := client.Do(req.Get, path)
 	if err != nil {
 		return
 	}
@@ -173,7 +173,7 @@ func (client *Client) UpdateAccount(id string, data any, customFields ...map[str
 	}
 	path := fmt.Sprintf("%s/%s", basePath, id)
 	req := client.httpClient.R().SetBody(body)
-	res, err := req.Patch(path)
+	res, err := client.Do(req.Patch, path)
 	if err != nil {
 		return
 	}
@@ -207,7 +207,7 @@ func (client *Client) UpdateCase(id string, data *CaseUpdate, customFields ...ma
 	if data.SkipAutoAssign {
 		req.SetHeader("Sforce-Auto-Assign", "FALSE")
 	}
-	res, err := req.Patch(path)
+	res, err := client.Do(req.Patch, path)
 	if err != nil {
 		return
 	}
@@ -233,7 +233,7 @@ func (client *Client) CreateCase(data *CaseCreate, customFields ...map[string]an
 		SetBody(body).
 		SetResult(&RecordCreatedResponse{}).
 		SetError(SalesforceErrorResponse{})
-	res, err := req.Post(basePath)
+	res, err := client.Do(req.Post, basePath)
 	if err != nil {
 		return
 	}
@@ -255,7 +255,7 @@ func (client *Client) FeedItem(id string) (result *FeedItem, err error) {
 		return
 	}
 	req := client.httpClient.R().SetResult(&FeedItem{})
-	res, err := req.Get(fmt.Sprintf("%s/%s", basePath, id))
+	res, err := client.Do(req.Get, fmt.Sprintf("%s/%s", basePath, id))
 	if err != nil {
 		return
 	}
@@ -277,7 +277,7 @@ func (client *Client) CreateFeedItem(data *FeedItemOptions) (*RecordCreatedRespo
 		return nil, err
 	}
 	req := client.httpClient.R().SetResult(&RecordCreatedResponse{}).SetError(SalesforceErrorResponse{}).SetBody(data)
-	res, err := req.Post(basePath)
+	res, err := client.Do(req.Post, basePath)
 	if err != nil {
 		return nil, err
 	}

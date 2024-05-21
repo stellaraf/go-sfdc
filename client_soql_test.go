@@ -10,7 +10,7 @@ import (
 )
 
 func Test_SOQL(t *testing.T) {
-
+	t.Parallel()
 	t.Run("where equals", func(t *testing.T) {
 		t.Parallel()
 		expected := "SELECT Id FROM Case WHERE IsClosed = false LIMIT 10"
@@ -42,7 +42,7 @@ func Test_SOQL(t *testing.T) {
 	})
 	t.Run("where starts with query", func(t *testing.T) {
 		t.Parallel()
-		q := sfdc.SOQL().Select("Id").From("Case").Where("Subject", sfdc.STARTS_WITH, "A").Limit(1)
+		q := sfdc.SOQL().Select("Id").From("Case").Where("Subject", sfdc.STARTS_WITH, "go").Limit(1)
 		sc := sfdc.NewSOQL[sfdc.OpenCase](Client)
 		results, err := sc.Query(q)
 		require.NoError(t, err)
@@ -50,7 +50,7 @@ func Test_SOQL(t *testing.T) {
 	})
 	t.Run("where ends with query", func(t *testing.T) {
 		t.Parallel()
-		q := sfdc.SOQL().Select("Id").From("Case").Where("Subject", sfdc.ENDS_WITH, "e").Limit(1)
+		q := sfdc.SOQL().Select("Id").From("Case").Where("Subject", sfdc.ENDS_WITH, "0").Limit(1)
 		sc := sfdc.NewSOQL[sfdc.OpenCase](Client)
 		results, err := sc.Query(q)
 		require.NoError(t, err)
