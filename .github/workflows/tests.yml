@@ -1,0 +1,28 @@
+on: [push, pull_request]
+name: Test
+
+jobs:
+    test:
+        strategy:
+            matrix:
+                go-version:
+                    - 1.20.x
+                os: [ubuntu-latest]
+        runs-on: ${{ matrix.os }}
+        env:
+            SFDC_CLIENT_ID: "${{ secrets.SFDC_CLIENT_ID }}"
+            SFDC_CLIENT_SECRET: "${{ secrets.SFDC_CLIENT_SECRET }}"
+            SFDC_ENCRYPTION_PASSPHRASE: "${{ secrets.SFDC_ENCRYPTION_PASSPHRASE }}"
+            SFDC_AUTH_URL: "${{ secrets.SFDC_AUTH_URL }}"
+            SFDC_TEST_DATA: "${{ secrets.SFDC_TEST_DATA }}"
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Install Go
+              uses: actions/setup-go@v4
+              with:
+                  go-version: ${{ matrix.go-version }}
+
+            - name: Test
+              run: go test ./... -v
