@@ -1,6 +1,8 @@
-![stellar](https://res.cloudinary.com/stellaraf/image/upload/v1604277355/stellar-logo-gradient.svg)
+![stellar](https://res.cloudinary.com/stellaraf/image/upload/v1604277355/stellar-logo-gradient.png?width=300)
 
-## `go-sfdc` [![Tests](https://img.shields.io/github/actions/workflow/status/stellaraf/go-sfdc/tests.yml?style=for-the-badge)](https://github.com/stellaraf/go-sfdc/actions/workflows/tests.yml) [![Go Reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://pkg.go.dev/github.com/stellaraf/go-sfdc) [![GitHub Tag](https://img.shields.io/github/v/tag/stellaraf/go-sfdc?style=for-the-badge&label=Version)](https://github.com/stellaraf/go-sfdc/tags)
+## `go-sfdc`
+
+[![Tests](https://img.shields.io/github/actions/workflow/status/stellaraf/go-sfdc/tests.yml?style=for-the-badge&label=Tests)](https://github.com/stellaraf/go-sfdc/actions/workflows/tests.yml) [![Go Reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://pkg.go.dev/github.com/stellaraf/go-sfdc) [![GitHub Tag](https://img.shields.io/github/v/tag/stellaraf/go-sfdc?style=for-the-badge&label=Version)](https://github.com/stellaraf/go-sfdc/tags)
 
 
 ## Testing Environment Variables
