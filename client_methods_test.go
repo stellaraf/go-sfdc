@@ -1,6 +1,7 @@
 package sfdc_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stellaraf/go-sfdc"
@@ -72,5 +73,43 @@ func Test_CloseCase(t *testing.T) {
 		closedCase, err := Client.Case(newCase.ID)
 		require.NoError(t, err)
 		assert.Equal(t, "Closed", closedCase.Status)
+	})
+}
+
+func Test_GetObject(t *testing.T) {
+	t.Parallel()
+	path := fmt.Sprintf("/services/data/%s/sobjects/Account/%s", sfdc.API_VERSION, Env.TestData.AccountID)
+	account, err := Client.GetObject(path)
+	require.NoError(t, err)
+	id := account.GetString("Id")
+	assert.Equal(t, Env.TestData.AccountID, id, "mismatched id")
+	name := account.GetString("Name")
+	assert.Equal(t, Env.TestData.AccountName, name, "mismatched name")
+	assert.Equal(t, "", account.GetString("AccountSource"))
+}
+
+func Test_PostObject(t *testing.T) {
+	t.Parallel()
+	t.Run("create contact", func(t *testing.T) {
+		t.Parallel()
+		// Create (POST)
+		path := fmt.Sprintf("/services/data/%s/sobjects/Contact", sfdc.API_VERSION)
+		res, err := Client.PostObject(path, map[string]any{"LastName": t.Name()})
+		require.NoError(t, err, "failed to create")
+		require.True(t, res.Success, "success=%v", res.Success)
+
+		// Update (PATCH)
+		objPath := fmt.Sprintf("%s/%s", path, res.ID)
+		err = Client.PatchObject(objPath, map[string]any{"FirstName": t.Name()})
+		require.NoError(t, err, "failed to update")
+
+		// Verify (GET)
+		obj, err := Client.GetObject(objPath)
+		require.NoError(t, err, "failed to get after update")
+		assert.Equal(t, t.Name(), obj.GetString("FirstName"))
+
+		// Delete (DELETE)
+		err = Client.DeleteObject(objPath)
+		require.NoError(t, err, "failed to delete")
 	})
 }
