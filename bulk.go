@@ -110,7 +110,22 @@ func (bc *BulkClient) Insert(bulkJob *BulkJob, data any) (*BulkJobCompleteRespon
 		return nil, err
 	}
 	return complete, nil
+}
 
+func (bc *BulkClient) InsertRaw(bulkJob *BulkJob, data string) (*BulkJobCompleteResponse, error) {
+	job, err := bc.jobReq(bulkJob)
+	if err != nil {
+		return nil, err
+	}
+	err = bc.uploadData(job.ID, data)
+	if err != nil {
+		return nil, err
+	}
+	complete, err := bc.complete(job.ID)
+	if err != nil {
+		return nil, err
+	}
+	return complete, nil
 }
 
 func MarshalCSV(base any, customFields ...CustomFields) (string, error) {
