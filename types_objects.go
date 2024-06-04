@@ -8,19 +8,20 @@ type Attributes struct {
 }
 
 type BaseObject struct {
-	Attributes       Attributes `json:"attributes"`
-	CreatedByID      string     `json:"CreatedById"`
-	CreatedDate      string     `json:"CreatedDate"`
-	ID               string     `json:"Id"`
-	LastModifiedByID string     `json:"LastModifiedById"`
-	LastModifiedDate string     `json:"LastModifiedDate"`
-	OwnerID          string     `json:"OwnerId"`
-	SystemModStamp   string     `json:"SystemModstamp"`
+	Attributes       *Attributes `json:"attributes,omitempty"`
+	CreatedByID      string      `json:"CreatedById,omitempty"`
+	CreatedDate      string      `json:"CreatedDate,omitempty"`
+	ID               string      `json:"Id,omitempty"`
+	LastModifiedByID string      `json:"LastModifiedById,omitempty"`
+	LastModifiedDate string      `json:"LastModifiedDate,omitempty"`
+	OwnerID          string      `json:"OwnerId,omitempty"`
+	SystemModStamp   string      `json:"SystemModstamp,omitempty"`
 }
 
 type Contact struct {
 	BaseObject
-	IsDeleted              bool
+	AccountID              string       `json:"AccountId,omitempty"`
+	IsDeleted              bool         `json:"IsDeleted,omitempty"`
 	MasterRecordID         string       `json:"MasterRecordId,omitempty"`
 	LastName               string       `json:"LastName,omitempty"`
 	FirstName              string       `json:"FirstName,omitempty"`
@@ -36,7 +37,7 @@ type Contact struct {
 	MailingLatitude        int          `json:"MailingLatitude,omitempty"`
 	MailingLongitude       int          `json:"MailingLongitude,omitempty"`
 	MailingGeocodeAccuracy string       `json:"MailingGeocodeAccuracy,omitempty"`
-	MailingAddress         Address      `json:"MailingAddress,omitempty"`
+	MailingAddress         *Address     `json:"MailingAddress,omitempty"`
 	Phone                  string       `json:"Phone,omitempty"`
 	Fax                    string       `json:"Fax,omitempty"`
 	MobilePhone            string       `json:"MobilePhone,omitempty"`
@@ -78,17 +79,17 @@ type User struct {
 	Latitude          int          `json:"Latitude,omitempty"`
 	Longitude         int          `json:"Longitude,omitempty"`
 	GeocodeAccuracy   string       `json:"GeocodeAccuracy,omitempty"`
-	Address           Address      `json:"Address,omitempty"`
+	Address           *Address     `json:"Address,omitempty"`
 	Email             string       `json:"Email,omitempty"`
 	Phone             string       `json:"Phone,omitempty"`
-	Alias             string       `json:"Alias"`
+	Alias             string       `json:"Alias,omitempty"`
 	CommunityNickname string       `json:"CommunityNickname,omitempty"`
 	IsActive          bool         `json:"IsActive,omitempty"`
 	TimeZoneSidKey    string       `json:"TimeZoneSidKey,omitempty"`
 	UserRoleID        string       `json:"UserRoleId,omitempty"`
 	ManagerID         string       `json:"ManagerId,omitempty"`
 	UserType          string       `json:"UserType,omitempty"`
-	ProfileID         string       `json:"ProfileId"`
+	ProfileID         string       `json:"ProfileId,omitempty"`
 	ContactID         string       `json:"ContactId,omitempty"`
 	AccountID         string       `json:"AccountId,omitempty"`
 	CustomFields      CustomFields `json:"-"`
@@ -97,7 +98,7 @@ type User struct {
 type Group struct {
 	BaseObject
 	Name                   string       `json:"Name"`
-	Developer_Name         string       `json:"Developer_Name"`
+	Developer_Name         string       `json:"Developer_Name,omitempty"`
 	RelatedID              string       `json:"RelatedId,omitempty"`
 	QueueRoutingConfigID   string       `json:"QueueRoutingConfigId,omitempty"`
 	DoesSendEmailToMembers bool         `json:"DoesSendEmailToMembers,omitempty"`
@@ -110,7 +111,7 @@ type Group struct {
 type Account struct {
 	BaseObject
 	AccountSource           string       `json:"AccountSource,omitempty"`
-	BillingAddress          Address      `json:"BillingAddress,omitempty"`
+	BillingAddress          *Address     `json:"BillingAddress,omitempty"`
 	BillingCity             string       `json:"BillingCity,omitempty"`
 	BillingCountry          string       `json:"BillingCountry,omitempty"`
 	BillingGeocodeAccuracy  string       `json:"BillingGeocodeAccuracy,omitempty"`
@@ -134,7 +135,7 @@ type Account struct {
 	ParentID                string       `json:"ParentId,omitempty"`
 	Phone                   string       `json:"Phone,omitempty"`
 	PhotoUrl                string       `json:"PhotoUrl,omitempty"`
-	ShippingAddress         Address      `json:"ShippingAddress,omitempty"`
+	ShippingAddress         *Address     `json:"ShippingAddress,omitempty"`
 	ShippingCity            string       `json:"ShippingCity,omitempty"`
 	ShippingCountry         string       `json:"ShippingCountry,omitempty"`
 	ShippingGeocodeAccuracy string       `json:"ShippingGeocodeAccuracy,omitempty"`
@@ -193,9 +194,9 @@ type CaseCreate struct {
 
 type Case struct {
 	BaseObject
-	AccountId          string       `json:"AccountId"`
-	CaseNumber         string       `json:"CaseNumber"`
-	ClosedDate         string       `json:"ClosedDate"`
+	AccountId          string       `json:"AccountId,omitempty"`
+	CaseNumber         string       `json:"CaseNumber,omitempty"`
+	ClosedDate         string       `json:"ClosedDate,omitempty"`
 	Comments           string       `json:"Comments,omitempty"`
 	ContactEmail       string       `json:"ContactEmail,omitempty"`
 	ContactFax         string       `json:"ContactFax,omitempty"`
@@ -219,7 +220,7 @@ type Case struct {
 	Reason             string       `json:"Reason,omitempty"`
 	Status             string       `json:"Status,omitempty"`
 	StopStartDate      string       `json:"StopStartDate,omitempty"`
-	Subject            string       `json:"Subject"`
+	Subject            string       `json:"Subject,omitempty"`
 	SuppliedCompany    string       `json:"SuppliedCompany,omitempty"`
 	SuppliedEmail      string       `json:"SuppliedEmail,omitempty"`
 	SuppliedName       string       `json:"SuppliedName,omitempty"`
@@ -267,36 +268,36 @@ type FeedItemOptions struct {
 }
 
 type FeedItem struct {
-	Attributes         Attributes `json:"attributes"`
-	ID                 string     `json:"Id"`
-	ParentID           string     `json:"ParentId"`
-	Type               string     `json:"Type"`
-	CreatedByID        string     `json:"CreatedById"`
-	CreatedDate        string     `json:"CreatedDate"`
-	IsDeleted          bool       `json:"IsDeleted"`
-	LastModifiedDate   string     `json:"LastModifiedDate"`
-	SystemModstamp     string     `json:"SystemModstamp"`
-	Revision           int        `json:"Revision"`
-	LastEditByID       string     `json:"LastEditById,omitempty"`
-	LastEditDate       string     `json:"LastEditDate,omitempty"`
-	ConnectionID       string     `json:"ConnectionId,omitempty"`
-	CommentCount       int        `json:"CommentCount"`
-	LikeCount          int        `json:"LikeCount"`
-	Title              string     `json:"Title,omitempty"`
-	Body               string     `json:"Body"`
-	LinkURL            string     `json:"LinkUrl,omitempty"`
-	IsRichText         bool       `json:"IsRichText"`
-	RelatedRecordID    string     `json:"RelatedRecordId,omitempty"`
-	InsertedByID       string     `json:"InsertedById"`
-	NetworkScope       string     `json:"NetworkScope"`
-	Visibility         string     `json:"Visibility"`
-	BestCommentID      string     `json:"BestCommentId,omitempty"`
-	HasContent         bool       `json:"HasContent"`
-	HasLink            bool       `json:"HasLink"`
-	HasFeedEntity      bool       `json:"HasFeedEntity"`
-	HasVerifiedComment bool       `json:"HasVerifiedComment"`
-	IsClosed           bool       `json:"IsClosed"`
-	Status             string     `json:"Status"`
+	Attributes         *Attributes `json:"attributes,omitempty"`
+	ID                 string      `json:"Id,omitempty"`
+	ParentID           string      `json:"ParentId,omitempty"`
+	Type               string      `json:"Type,omitempty"`
+	CreatedByID        string      `json:"CreatedById,omitempty"`
+	CreatedDate        string      `json:"CreatedDate,omitempty"`
+	IsDeleted          bool        `json:"IsDeleted,omitempty"`
+	LastModifiedDate   string      `json:"LastModifiedDate,omitempty"`
+	SystemModstamp     string      `json:"SystemModstamp,omitempty"`
+	Revision           int         `json:"Revision,omitempty"`
+	LastEditByID       string      `json:"LastEditById,omitempty"`
+	LastEditDate       string      `json:"LastEditDate,omitempty"`
+	ConnectionID       string      `json:"ConnectionId,omitempty"`
+	CommentCount       int         `json:"CommentCount,omitempty"`
+	LikeCount          int         `json:"LikeCount,omitempty"`
+	Title              string      `json:"Title,omitempty"`
+	Body               string      `json:"Body,omitempty"`
+	LinkURL            string      `json:"LinkUrl,omitempty"`
+	IsRichText         bool        `json:"IsRichText,omitempty"`
+	RelatedRecordID    string      `json:"RelatedRecordId,omitempty"`
+	InsertedByID       string      `json:"InsertedById,omitempty"`
+	NetworkScope       string      `json:"NetworkScope,omitempty"`
+	Visibility         string      `json:"Visibility,omitempty"`
+	BestCommentID      string      `json:"BestCommentId,omitempty"`
+	HasContent         bool        `json:"HasContent,omitempty"`
+	HasLink            bool        `json:"HasLink,omitempty"`
+	HasFeedEntity      bool        `json:"HasFeedEntity,omitempty"`
+	HasVerifiedComment bool        `json:"HasVerifiedComment,omitempty"`
+	IsClosed           bool        `json:"IsClosed,omitempty"`
+	Status             string      `json:"Status,omitempty"`
 }
 
 type ServiceContract struct {

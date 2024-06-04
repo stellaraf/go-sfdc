@@ -26,7 +26,7 @@ func (client *Client) prepare() error {
 	return nil
 }
 
-// do executes a given resty request method such as Get/Post. If a timeout/backoff is specified,
+// Do executes a given resty request method such as Get/Post. If a timeout/backoff is specified,
 // the request will be executed and retried within that timeout period.
 func (client *Client) Do(doer func(u string) (*resty.Response, error), url string) (*resty.Response, error) {
 	op := func() (*resty.Response, error) {
@@ -36,6 +36,11 @@ func (client *Client) Do(doer func(u string) (*resty.Response, error), url strin
 		return op()
 	}
 	return backoff.RetryWithData(op, client.backoff)
+}
+
+// Bulk performs a bulk operation using BulkClient.
+func (client *Client) Bulk() *BulkClient {
+	return NewBulkClient(client)
 }
 
 // WithRetry specifies a time period in which to retry all requests if a errors are returned.
@@ -52,7 +57,6 @@ func New(
 	getToken CachedTokenCallback,
 	setToken SetTokenCallback,
 ) (*Client, error) {
-
 	auth, err := NewAuth(
 		clientID, clientSecret, authURL,
 		encryption,

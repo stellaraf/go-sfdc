@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+	"sort"
 	"strings"
 )
 
@@ -51,4 +52,17 @@ func MergeCustomFields(obj any, fields []map[string]any) (merged map[string]any,
 	}
 	merged, err = MergeStructToMap(obj, allFields)
 	return
+}
+
+func SortMap[T any](m map[string]T) map[string]T {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	om := make(map[string]T, len(keys))
+	for _, k := range keys {
+		om[k] = m[k]
+	}
+	return om
 }

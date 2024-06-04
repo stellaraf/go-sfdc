@@ -170,3 +170,11 @@ func Test_MergeStructToMap(t *testing.T) {
 		}
 	})
 }
+
+func Test_SortMap(t *testing.T) {
+	t.Parallel()
+	m1 := map[string]string{"m": "m", "a": "a", "z": "z"}
+	m2 := util.SortMap(m1)
+	e := map[string]string{"a": "a", "m": "m", "z": "z"}
+	assert.Equal(t, e, m2)
+}

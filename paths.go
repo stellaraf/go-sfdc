@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-const API_VERSION string = "v56.0"
+const API_VERSION string = "v58.0"
 
 const PATH_ACCOUNT string = "/services/data/%s/sobjects/Account"
 const PATH_CASE string = "/services/data/%s/sobjects/Case"
@@ -15,6 +15,9 @@ const PATH_PRICEBOOK_ENTRY string = "/services/data/%s/sobjects/PricebookEntry"
 const PATH_SERVICE_CONTRACT string = "/services/data/%s/sobjects/ServiceContract"
 const PATH_SOQL string = "/services/data/%s/query"
 const PATH_USER string = "/services/data/%s/sobjects/User"
+
+const PATH_BULK_INGEST string = "/services/data/%s/jobs/ingest"
+const PATH_BULK_INGEST_COMPLETE string = "/services/data/%s/jobs/ingest/%s"
 
 var pathMap map[string]string = map[string]string{
 	"account":          PATH_ACCOUNT,
