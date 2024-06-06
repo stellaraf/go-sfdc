@@ -26,7 +26,7 @@ func TestClient_SendFeedItem(t *testing.T) {
 		ParentID:    newCase.ID,
 	})
 	require.NoError(t, err, "failed to send feed item")
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 15)
 	q := sfdc.SOQL().
 		Select("Id").
 		From("FeedItem").
@@ -57,7 +57,7 @@ func TestClient_SendCaseUpdate(t *testing.T) {
 		Description: "2",
 	})
 	require.NoError(t, err, "failed to update case")
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 15)
 	case2, err := Client.Case(case1.ID)
 	require.NoError(t, err)
 	assert.Equal(t, "2", case2.Description)
