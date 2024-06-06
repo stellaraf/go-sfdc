@@ -210,10 +210,10 @@ type Case struct {
 	IsEscalated        bool         `json:"IsEscalated,omitempty"`
 	IsStopped          bool         `json:"IsStopped,omitempty"`
 	Language           string       `json:"Language,omitempty"`
-	LastReferencedDate string       `json:"LastReferencedDate"`
-	LastViewedDate     string       `json:"LastViewedDate"`
+	LastReferencedDate string       `json:"LastReferencedDate,omitempty"`
+	LastViewedDate     string       `json:"LastViewedDate,omitempty"`
 	MasterRecordID     string       `json:"MasterRecordId,omitempty"`
-	MilestoneStatus    string       `json:"MilestoneStatus"`
+	MilestoneStatus    string       `json:"MilestoneStatus,omitempty"`
 	Origin             string       `json:"Origin,omitempty"`
 	OwnerID            string       `json:"OwnerId,omitempty"`
 	ParentID           string       `json:"ParentId,omitempty"`

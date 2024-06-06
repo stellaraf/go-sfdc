@@ -20,12 +20,22 @@ func NewBulkClient(client *Client) *BulkClient {
 	}
 }
 
-func (bc *BulkClient) NewJob(object string) *BulkJob {
+func (bc *BulkClient) NewInsertJob(object string) *BulkJob {
 	return &BulkJob{
 		Object:      object,
 		ContentType: "CSV",
 		Operation:   "insert",
 		LineEnding:  "LF",
+	}
+}
+
+func (bc *BulkClient) NewUpsertJob(object string, extIDField string) *BulkJob {
+	return &BulkJob{
+		Object:              object,
+		ContentType:         "CSV",
+		Operation:           "upsert",
+		LineEnding:          "LF",
+		ExternalIDFieldName: extIDField,
 	}
 }
 
@@ -92,24 +102,62 @@ func (bc *BulkClient) complete(id string) (*BulkJobCompleteResponse, error) {
 	return data, nil
 }
 
-func (bc *BulkClient) Insert(bulkJob *BulkJob, data any) (*BulkJobCompleteResponse, error) {
-	bulkData, err := bulkJob.CSV(data)
+func (bc *BulkClient) JobStatus(id string) (*BulkJobStatus, error) {
+	err := bc.main.prepare()
+	if err != nil {
+		return nil, err
+	}
+	path := fmt.Sprintf(PATH_BULK_INGEST_COMPLETE, API_VERSION, id)
+	req := bc.main.httpClient.R().SetHeader("accept", "application/json").SetHeader("content-type", "application/json")
+	req.SetResult(&BulkJobStatus{})
+	res, err := req.Get(path)
+	if err != nil {
+		return nil, err
+	}
+	if !res.IsSuccess() {
+		return nil, fmt.Errorf("failed to get job %s status: %s", id, string(res.Body()))
+	}
+	data, ok := res.Result().(*BulkJobStatus)
+	if !ok {
+		return nil, fmt.Errorf("failed to parse job status response")
+	}
+	return data, nil
+}
+
+func (bc *BulkClient) jobIsState(id, state string) (bool, error) {
+	status, err := bc.JobStatus(id)
+	if err != nil {
+		return false, err
+	}
+	return status.State == state, nil
+}
+
+func (bc *BulkClient) JobIsComplete(id string) (bool, error) {
+	return bc.jobIsState(id, "JobComplete")
+}
+
+func (bc *BulkClient) JobIsFailed(id string) (bool, error) {
+	return bc.jobIsState(id, "Failed")
+}
+
+func (bc *BulkClient) JobIsInProgress(id string) (bool, error) {
+	return bc.jobIsState(id, "InProgress")
+}
+
+func (bc *BulkClient) JobIsOpen(id string) (bool, error) {
+	return bc.jobIsState(id, "Open")
+}
+
+func (bc *BulkClient) JobIsAborted(id string) (bool, error) {
+	return bc.jobIsState(id, "Aborted")
+}
+
+func (bc *BulkClient) Insert(bulkJob *BulkJob, data any, cf ...map[string]any) (*BulkJobCompleteResponse, error) {
+	bulkData, err := MarshalCSV(data, cf...)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to convert data to CSV")
 	}
-	job, err := bc.jobReq(bulkJob)
-	if err != nil {
-		return nil, err
-	}
-	err = bc.uploadData(job.ID, bulkData)
-	if err != nil {
-		return nil, err
-	}
-	complete, err := bc.complete(job.ID)
-	if err != nil {
-		return nil, err
-	}
-	return complete, nil
+	return bc.InsertRaw(bulkJob, bulkData)
 }
 
 func (bc *BulkClient) InsertRaw(bulkJob *BulkJob, data string) (*BulkJobCompleteResponse, error) {
@@ -128,7 +176,15 @@ func (bc *BulkClient) InsertRaw(bulkJob *BulkJob, data string) (*BulkJobComplete
 	return complete, nil
 }
 
-func MarshalCSV(base any, customFields ...CustomFields) (string, error) {
+func (bc *BulkClient) Upsert(bulkJob *BulkJob, data any, cf ...map[string]any) (*BulkJobCompleteResponse, error) {
+	return bc.Insert(bulkJob, data, cf...)
+}
+
+func (bc *BulkClient) UpsertRaw(bulkJob *BulkJob, data string) (*BulkJobCompleteResponse, error) {
+	return bc.InsertRaw(bulkJob, data)
+}
+
+func MarshalCSV(base any, customFields ...map[string]any) (string, error) {
 	b, err := json.Marshal(&base)
 	if err != nil {
 		return "", errors.Wrap(err, "failed initial json encoding")

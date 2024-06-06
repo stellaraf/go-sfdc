@@ -1,14 +1,11 @@
 package sfdc
 
 type BulkJob struct {
-	Object      string `json:"object"`
-	ContentType string `json:"contentType"`
-	Operation   string `json:"operation"`
-	LineEnding  string `json:"lineEnding"`
-}
-
-func (job *BulkJob) CSV(data any, cf ...CustomFields) (string, error) {
-	return MarshalCSV(data, cf...)
+	Object              string `json:"object"`
+	ContentType         string `json:"contentType"`
+	Operation           string `json:"operation"`
+	LineEnding          string `json:"lineEnding"`
+	ExternalIDFieldName string `json:"externalIdFieldName,omitempty"`
 }
 
 type BulkJobComplete struct {

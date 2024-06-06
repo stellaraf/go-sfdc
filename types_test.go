@@ -23,20 +23,3 @@ func Test_Time(t *testing.T) {
 		assert.Equal(t, rfc3339, s.Timestamp.Format(time.RFC3339))
 	})
 }
-
-func TestBulkJob_CSV(t *testing.T) {
-	t.Run("basic", func(t *testing.T) {
-		type Data struct {
-			String string `json:"string"`
-			Int    int    `json:"int"`
-			Bool   bool   `json:"bool"`
-		}
-		data := Data{String: "value", Int: 100, Bool: true}
-		job := &sfdc.BulkJob{}
-		result, err := job.CSV(data)
-		require.NoError(t, err)
-		assert.Contains(t, result, "value")
-		assert.Contains(t, result, "100")
-		assert.Contains(t, result, "true")
-	})
-}

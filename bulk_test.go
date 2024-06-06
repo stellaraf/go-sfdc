@@ -14,7 +14,7 @@ func TestBulkClient_Insert(t *testing.T) {
 	t.Parallel()
 	client := sfdc.NewBulkClient(Client)
 	contact := sfdc.Contact{LastName: t.Name(), AccountID: Env.TestData.AccountID}
-	job := client.NewJob("Contact")
+	job := client.NewInsertJob("Contact")
 	res, err := client.Insert(job, &contact)
 	require.NoError(t, err)
 	assert.NotEmpty(t, res.ID)
