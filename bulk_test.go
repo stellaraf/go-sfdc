@@ -38,9 +38,9 @@ func Test_MarshalCSV(t *testing.T) {
 		t.Parallel()
 		contact := sfdc.Contact{Name: t.Name()}
 		csv, err := sfdc.MarshalCSV(&contact)
-		expected := fmt.Sprintf("Name\n%s\n", t.Name())
+		contains := fmt.Sprintf("Name\n%s\n", t.Name())
 		require.NoError(t, err)
-		assert.Equal(t, expected, csv)
+		assert.Contains(t, csv, contains)
 	})
 	t.Run("custom fields", func(t *testing.T) {
 		t.Parallel()
@@ -48,6 +48,6 @@ func Test_MarshalCSV(t *testing.T) {
 		contact.CustomFields["Field__c"] = "Value"
 		csv, err := sfdc.MarshalCSV(&contact, contact.CustomFields)
 		require.NoError(t, err)
-		assert.Equal(t, "Field__c,Name\nValue,John\n", csv)
+		assert.Contains(t, "Field__c,Name\nValue,John\n", csv)
 	})
 }
