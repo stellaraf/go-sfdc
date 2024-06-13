@@ -9,7 +9,7 @@ require (
 	github.com/muesli/cache2go v0.0.0-20221011235721-518229cd8021
 	github.com/perimeterx/marshmallow v1.1.5
 	github.com/pkg/errors v0.9.1
-	github.com/stellaraf/go-utils v0.0.5
+	github.com/stellaraf/go-utils v0.1.6
 	github.com/stretchr/testify v1.8.4
 )
 

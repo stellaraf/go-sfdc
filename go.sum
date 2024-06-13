@@ -21,6 +21,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stellaraf/go-utils v0.0.5 h1:zwJHlW5+Nudwmppx55UqhIvSGjGVVVDDbtnNiovShA4=
 github.com/stellaraf/go-utils v0.0.5/go.mod h1:j1NVjsRUigYa1D6ixIjaAgO3P3fXuUSMuIUh6Gp1bik=
+github.com/stellaraf/go-utils v0.1.6 h1:3gwSW4+T+cNx5ThGVFgTnoulwd6voZRhtIan8JPduC4=
+github.com/stellaraf/go-utils v0.1.6/go.mod h1:j1NVjsRUigYa1D6ixIjaAgO3P3fXuUSMuIUh6Gp1bik=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/ugorji/go/codec v1.2.7 h1:YPXUKf7fYbp/y8xloBqZOw2qaVggbfwMlI8WM3wZUJ0=

@@ -5,9 +5,11 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/stellaraf/go-sfdc/internal/util"
+	"github.com/stellaraf/go-utils"
 )
 
 type BulkClient struct {
@@ -184,6 +186,41 @@ func (bc *BulkClient) UpsertRaw(bulkJob *BulkJob, data string) (*BulkJobComplete
 	return bc.InsertRaw(bulkJob, data)
 }
 
+func (bc *BulkClient) InsertMultiple(bulkJob *BulkJob, data any) (*BulkJobCompleteResponse, error) {
+	csv, err := MarshalCSVSlice(data)
+	if err != nil {
+		return nil, err
+	}
+	return bc.InsertRaw(bulkJob, csv)
+}
+
+func (bc *BulkClient) UpsertMultiple(bulkJob *BulkJob, data any) (*BulkJobCompleteResponse, error) {
+	return bc.InsertMultiple(bulkJob, data)
+}
+
+func mapToCSV(m map[string]any) (string, error) {
+	bm := util.SortMap(m)
+	headers := make([]string, 0, len(bm))
+	values := make([]string, 0, len(bm))
+	for k, v := range bm {
+		headers = append(headers, k)
+		values = append(values, fmt.Sprint(v))
+	}
+	buffer := new(bytes.Buffer)
+	writer := csv.NewWriter(buffer)
+	err := writer.Write(headers)
+	if err != nil {
+		return "", err
+	}
+	err = writer.Write(values)
+	if err != nil {
+		return "", err
+	}
+	writer.Flush()
+	out := buffer.String()
+	return strings.TrimLeft(out, "\n"), nil
+}
+
 func MarshalCSV(base any, customFields ...map[string]any) (string, error) {
 	b, err := json.Marshal(&base)
 	if err != nil {
@@ -199,12 +236,34 @@ func MarshalCSV(base any, customFields ...map[string]any) (string, error) {
 			bm[k] = v
 		}
 	}
-	bm = util.SortMap(bm)
-	headers := make([]string, 0, len(bm))
-	values := make([]string, 0, len(bm))
-	for k, v := range bm {
-		headers = append(headers, k)
-		values = append(values, fmt.Sprint(v))
+	return mapToCSV(bm)
+}
+
+func MarshalCSVSlice(base any) (string, error) {
+	b, err := json.Marshal(&base)
+	if err != nil {
+		return "", errors.Wrap(err, "failed initial json encoding")
+	}
+	sl := make([]map[string]any, 0)
+	err = json.Unmarshal(b, &sl)
+	if err != nil {
+		return "", errors.Wrap(err, "failed initial json decoding")
+	}
+
+	headers := make([]string, 0)
+	rows := make([][]string, 0)
+	for _, s := range sl {
+		for k := range s {
+			headers = append(headers, k)
+		}
+	}
+	headers = utils.Set(headers)
+	for _, m := range sl {
+		values := make([]string, 0, len(headers))
+		for _, h := range headers {
+			values = append(values, fmt.Sprint(m[h]))
+		}
+		rows = append(rows, values)
 	}
 	buffer := new(bytes.Buffer)
 	writer := csv.NewWriter(buffer)
@@ -212,10 +271,13 @@ func MarshalCSV(base any, customFields ...map[string]any) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = writer.Write(values)
-	if err != nil {
-		return "", err
+	for _, row := range rows {
+		err = writer.Write(row)
+		if err != nil {
+			return "", err
+		}
 	}
 	writer.Flush()
-	return buffer.String(), nil
+	out := buffer.String()
+	return strings.TrimLeft(out, "\n"), nil
 }
