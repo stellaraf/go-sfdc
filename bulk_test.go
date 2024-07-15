@@ -93,7 +93,9 @@ func Test_MarshalCSV(t *testing.T) {
 		contact.CustomFields["Field__c"] = "Value"
 		csv, err := sfdc.MarshalCSV(&contact, contact.CustomFields)
 		require.NoError(t, err)
-		assert.Contains(t, "Field__c,Name\nValue,John\n", csv)
+		if !strings.Contains(csv, "Field__c,Name\nValue,John\n") && !strings.Contains(csv, "Name,Field__c\nJohn,Value\n") {
+			assert.FailNow(t, "mismatching CSV")
+		}
 	})
 }
 
