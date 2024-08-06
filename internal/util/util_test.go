@@ -3,8 +3,8 @@ package util_test
 import (
 	"testing"
 
-	"github.com/stellaraf/go-sfdc/internal/util"
 	"github.com/stretchr/testify/assert"
+	"go.stellar.af/go-sfdc/internal/util"
 )
 
 const private_key_no_spaces string = `-----BEGIN RSA PRIVATE KEY-----

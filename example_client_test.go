@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/muesli/cache2go"
-	"github.com/stellaraf/go-sfdc"
+	"go.stellar.af/go-sfdc"
 )
 
 // In this example, the cache2go caching backend is used, but any caching backend can be used.

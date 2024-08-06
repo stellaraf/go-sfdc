@@ -3,7 +3,7 @@ package sfdc_test
 import (
 	"fmt"
 
-	"github.com/stellaraf/go-sfdc"
+	"go.stellar.af/go-sfdc"
 )
 
 // See client example for client initialization example.

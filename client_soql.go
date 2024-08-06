@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stellaraf/go-sfdc/internal/util"
-	"github.com/stellaraf/go-utils"
+	"go.stellar.af/go-sfdc/internal/util"
+	"go.stellar.af/go-utils/is"
 )
 
 type where struct {
@@ -91,7 +91,7 @@ func sliceType[T comparable](value any) ([]T, bool) {
 // SOQL 'WHERE' function.
 func (s *soql) Where(key string, operator SOQLOperator, value interface{}) *soql {
 	var _where where
-	if (operator == IN || operator == NOT_IN) && utils.IsSlice(value) {
+	if (operator == IN || operator == NOT_IN) && is.Slice(value) {
 		values := []string{}
 		s_str, is_str := sliceType[string](value)
 		s_int, is_int := sliceType[int](value)
@@ -181,10 +181,10 @@ func (s *soql) Where(key string, operator SOQLOperator, value interface{}) *soql
 			val := fmt.Sprintf("'%%%v'", value)
 			_where = where{Key: key, Operator: LIKE, Value: val}
 		default:
-			if utils.IsTime(value) {
+			if is.Time(value) {
 				val := value.(time.Time)
 				_where = where{Key: key, Operator: operator, Value: val.Format(time.RFC3339)}
-			} else if utils.IsString(value) {
+			} else if is.String(value) {
 				val := util.EscapeString(value.(string))
 				_where = where{Key: key, Operator: operator, Value: fmt.Sprintf("'%s'", val)}
 			} else {

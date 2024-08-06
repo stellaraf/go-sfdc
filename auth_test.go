@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/muesli/cache2go"
-	"github.com/stellaraf/go-sfdc"
-	"github.com/stellaraf/go-sfdc/internal/env"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.stellar.af/go-sfdc"
+	"go.stellar.af/go-sfdc/internal/env"
 )
 
 func setupAuth() (

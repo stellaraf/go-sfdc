@@ -2,7 +2,13 @@
 
 ## `go-sfdc`
 
-[![Tests](https://img.shields.io/github/actions/workflow/status/stellaraf/go-sfdc/tests.yml?style=for-the-badge&label=Tests)](https://github.com/stellaraf/go-sfdc/actions/workflows/tests.yml) [![Go Reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://pkg.go.dev/github.com/stellaraf/go-sfdc) [![GitHub Tag](https://img.shields.io/github/v/tag/stellaraf/go-sfdc?style=for-the-badge&label=Version)](https://github.com/stellaraf/go-sfdc/tags)
+[![Tests](https://img.shields.io/github/actions/workflow/status/stellaraf/go-sfdc/tests.yml?style=for-the-badge&label=Tests)](https://github.com/stellaraf/go-sfdc/actions/workflows/tests.yml) [![Go Reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=for-the-badge)](https://pkg.go.dev/go.stellar.af/go-sfdc) [![GitHub Tag](https://img.shields.io/github/v/tag/stellaraf/go-sfdc?style=for-the-badge&label=Version)](https://github.com/stellaraf/go-sfdc/tags)
+
+## Installation
+
+```
+go get -u go.stellar.af/go-sfdc
+```
 
 
 ## Testing Environment Variables

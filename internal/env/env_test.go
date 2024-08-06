@@ -3,8 +3,8 @@ package env_test
 import (
 	"testing"
 
-	"github.com/stellaraf/go-sfdc/internal/env"
 	"github.com/stretchr/testify/assert"
+	"go.stellar.af/go-sfdc/internal/env"
 )
 
 func Test_FindProjectRoot(t *testing.T) {

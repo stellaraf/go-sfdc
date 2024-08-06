@@ -4,7 +4,7 @@ package sfdc
 import (
 	"fmt"
 
-	"github.com/stellaraf/go-sfdc/internal/util"
+	"go.stellar.af/go-sfdc/internal/util"
 )
 
 // Retrieve an Account.

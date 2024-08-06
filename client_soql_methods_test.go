@@ -3,9 +3,9 @@ package sfdc_test
 import (
 	"testing"
 
-	"github.com/stellaraf/go-sfdc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.stellar.af/go-sfdc"
 )
 
 func Test_OpenCases(t *testing.T) {

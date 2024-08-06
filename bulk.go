@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/stellaraf/go-sfdc/internal/util"
-	"github.com/stellaraf/go-utils"
+	"go.stellar.af/go-sfdc/internal/util"
+	"go.stellar.af/go-utils/slice"
 )
 
 type BulkClient struct {
@@ -257,7 +257,7 @@ func MarshalCSVSlice(base any) (string, error) {
 			headers = append(headers, k)
 		}
 	}
-	headers = utils.Set(headers)
+	headers = slice.Dedup(headers)
 	for _, m := range sl {
 		values := make([]string, 0, len(headers))
 		for _, h := range headers {

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/stellaraf/go-utils/encryption"
+	"go.stellar.af/go-utils/encryption"
 )
 
 type Auth struct {

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stellaraf/go-sfdc"
-	"github.com/stellaraf/go-utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.stellar.af/go-sfdc"
+	"go.stellar.af/go-utils/random"
 )
 
 func Test_Account(t *testing.T) {
@@ -104,7 +104,7 @@ func Test_CreateCase(t *testing.T) {
 			Status:      "New",
 			Subject:     subject,
 		}
-		customFieldValue, err := utils.RandomString(16)
+		customFieldValue, err := random.String(16)
 		require.NoError(t, err)
 		customFields := sfdc.CustomFields{Env.TestData.CaseCustomFieldKey: customFieldValue}
 		result, err := Client.CreateCase(caseData, customFields)
