@@ -6,10 +6,26 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.stellar.af/go-sfdc"
 )
+
+func BulkJobStatus(client *sfdc.BulkClient, jobID string, maxTime time.Duration) (*sfdc.BulkJobStatus, error) {
+	bo := backoff.NewExponentialBackOff(backoff.WithMaxElapsedTime(maxTime))
+	backoffFn := func() (*sfdc.BulkJobStatus, error) {
+		status, err := client.JobStatus(jobID)
+		if err != nil {
+			return nil, err
+		}
+		if status.State != "JobComplete" {
+			return nil, fmt.Errorf("not complete yet")
+		}
+		return status, nil
+	}
+	return backoff.RetryWithData(backoffFn, bo)
+}
 
 func TestBulkClient_Insert(t *testing.T) {
 	t.Parallel()
@@ -19,17 +35,19 @@ func TestBulkClient_Insert(t *testing.T) {
 	res, err := client.Insert(job, &contact)
 	require.NoError(t, err)
 	assert.NotEmpty(t, res.ID)
-
+	status, err := BulkJobStatus(client, res.ID, 60*time.Second)
+	require.NoError(t, err)
 	t.Cleanup(func() {
-		time.Sleep(time.Second * 2)
-		soql := sfdc.NewSOQL[sfdc.ObjectID](Client)
-		q := sfdc.SOQL().Select("Id").From("Contact").Where("LastName", sfdc.EQUALS, t.Name())
-		res, err := soql.Query(q)
-		require.NoError(t, err)
-		for _, record := range res.Records {
-			path := fmt.Sprintf(sfdc.PATH_CONTACT, sfdc.API_VERSION) + fmt.Sprintf("/%s", record.ID)
-			err := Client.DeleteObject(path)
+		if status.State == "JobComplete" {
+			soql := sfdc.NewSOQL[sfdc.ObjectID](Client)
+			q := sfdc.SOQL().Select("Id").From("Contact").Where("LastName", sfdc.EQUALS, t.Name())
+			res, err := soql.Query(q)
 			require.NoError(t, err)
+			for _, record := range res.Records {
+				path := fmt.Sprintf(sfdc.PATH_CONTACT, sfdc.API_VERSION) + fmt.Sprintf("/%s", record.ID)
+				err := Client.DeleteObject(path)
+				require.NoError(t, err)
+			}
 		}
 	})
 }
@@ -53,8 +71,7 @@ func TestBulkClient_InsertMultiple(t *testing.T) {
 	res, err := client.InsertMultiple(job, contacts)
 	require.NoError(t, err)
 	require.NotEmpty(t, res.ID)
-	time.Sleep(time.Second * 15)
-	status, err := client.JobStatus(res.ID)
+	status, err := BulkJobStatus(client, res.ID, 60*time.Second)
 	require.NoError(t, err)
 	if status.State == "Failed" {
 		t.Logf("state=%s failed=%d processed=%d", status.State, status.NumberRecordsFailed, status.NumberRecordsProcessed)
@@ -63,7 +80,6 @@ func TestBulkClient_InsertMultiple(t *testing.T) {
 	assert.Equal(t, 0, status.NumberRecordsFailed)
 	t.Cleanup(func() {
 		if status.State == "JobComplete" {
-			time.Sleep(time.Second * 15)
 			soql := sfdc.NewSOQL[sfdc.ObjectID](Client)
 			q := sfdc.SOQL().Select("Id").From("Contact").Where("FirstName", sfdc.EQUALS, t.Name())
 			res, err := soql.Query(q)

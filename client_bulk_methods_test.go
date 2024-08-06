@@ -1,13 +1,27 @@
 package sfdc_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.stellar.af/go-sfdc"
 )
+
+func GetObject[R any](maxTime time.Duration, getter func() (*R, error)) (*R, error) {
+	bo := backoff.NewExponentialBackOff(backoff.WithMaxElapsedTime(maxTime))
+	backoffFn := func() (*R, error) {
+		res, err := getter()
+		if err != nil {
+			return nil, err
+		}
+		return res, nil
+	}
+	return backoff.RetryWithData(backoffFn, bo)
+}
 
 func TestClient_SendFeedItem(t *testing.T) {
 	subj := createCaseSubject(t)
@@ -26,14 +40,24 @@ func TestClient_SendFeedItem(t *testing.T) {
 		ParentID:    newCase.ID,
 	})
 	require.NoError(t, err, "failed to send feed item")
-	time.Sleep(time.Second * 15)
+
 	q := sfdc.SOQL().
 		Select("Id").
 		From("FeedItem").
 		Where("ParentId", sfdc.EQUALS, newCase.ID).
 		Where("Title", sfdc.EQUALS, title)
 	soql := sfdc.NewSOQL[sfdc.ObjectID](Client)
-	res, err := soql.Query(q)
+	res, err := GetObject(60*time.Second, func() (*sfdc.RecordResponse[sfdc.ObjectID], error) {
+		res, err := soql.Query(q)
+		if err != nil {
+			return nil, err
+		}
+		if res.TotalSize == 0 {
+			return nil, fmt.Errorf("feed item not created yet")
+		}
+		return &res, nil
+	})
+
 	require.NoError(t, err, "failed to retrieve feed item")
 	assert.Len(t, res.Records, 1)
 	t.Cleanup(func() {
@@ -57,8 +81,17 @@ func TestClient_SendCaseUpdate(t *testing.T) {
 		Description: "2",
 	})
 	require.NoError(t, err, "failed to update case")
-	time.Sleep(time.Second * 15)
-	case2, err := Client.Case(case1.ID)
+	case2, err := GetObject(60*time.Second, func() (*sfdc.Case, error) {
+		res, err := Client.Case(case1.ID)
+		if err != nil {
+			return nil, err
+		}
+		if res.Description != "2" {
+			return nil, fmt.Errorf("not updated yet")
+		}
+		return res, nil
+
+	})
 	require.NoError(t, err)
 	assert.Equal(t, "2", case2.Description)
 	t.Cleanup(func() {
@@ -80,9 +113,16 @@ func TestClient_SendCloseCase(t *testing.T) {
 	err = Client.SendCloseCase(case1.ID)
 	require.NoError(t, err, "failed to close case")
 
-	time.Sleep(time.Second * 15)
-
-	case2, err := Client.Case(case1.ID)
+	case2, err := GetObject(60*time.Second, func() (*sfdc.Case, error) {
+		res, err := Client.Case(case1.ID)
+		if err != nil {
+			return nil, err
+		}
+		if res.Status != "Closed" {
+			return nil, fmt.Errorf("not closed yet")
+		}
+		return res, nil
+	})
 	require.NoError(t, err)
 	assert.Equal(t, "Closed", case2.Status)
 	t.Cleanup(func() {
