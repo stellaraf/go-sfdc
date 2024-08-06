@@ -81,15 +81,15 @@ func TestBulkClient_InsertMultiple(t *testing.T) {
 	t.Cleanup(func() {
 		if status.State == "JobComplete" {
 			soql := sfdc.NewSOQL[sfdc.ObjectID](Client)
-			q := sfdc.SOQL().Select("Id").From("Contact").Where("FirstName", sfdc.EQUALS, t.Name())
+			q := sfdc.SOQL().Select("Id").From("Contact").Where("FirstName", sfdc.EQUALS, t.Name()).Where("LastName", sfdc.CONTAINS, lastName)
 			res, err := soql.Query(q)
 			require.NoError(t, err)
-			assert.Len(t, res.Records, len(contacts))
 			for _, record := range res.Records {
 				path := fmt.Sprintf(sfdc.PATH_CONTACT, sfdc.API_VERSION) + fmt.Sprintf("/%s", record.ID)
 				err := Client.DeleteObject(path)
 				require.NoError(t, err)
 			}
+			assert.Len(t, res.Records, len(contacts))
 		}
 	})
 }
