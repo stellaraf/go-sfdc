@@ -32,6 +32,34 @@ func (client *Client) Account(id string) (account *Account, err error) {
 	return
 }
 
+// Retrieve a Lead.
+func (client *Client) Lead(id string) (*Lead, error) {
+	err := client.prepare()
+	if err != nil {
+		return nil, err
+	}
+	basePath, err := getPath("lead")
+	if err != nil {
+		return nil, err
+	}
+	path := fmt.Sprintf("%s/%s", basePath, id)
+	req := client.httpClient.R()
+	res, err := client.Do(req.Get, path)
+	if err != nil {
+		return nil, err
+	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return nil, err
+	}
+	lead := new(Lead)
+	err = client.handleResponse(res, lead)
+	if err != nil {
+		return nil, err
+	}
+	return lead, nil
+}
+
 // Retrieve a User.
 func (client *Client) User(id string) (user *User, err error) {
 	err = client.prepare()
@@ -287,4 +315,54 @@ func (client *Client) CreateFeedItem(data *FeedItemOptions) (*RecordCreatedRespo
 	}
 	result := res.Result().(*RecordCreatedResponse)
 	return result, nil
+}
+
+func (client *Client) CreateLead(lead *Lead) (*RecordCreatedResponse, error) {
+	err := client.prepare()
+	if err != nil {
+		return nil, err
+	}
+	basePath, err := getPath("lead")
+	if err != nil {
+		return nil, err
+	}
+	req := client.httpClient.R().
+		SetResult(&RecordCreatedResponse{}).
+		SetError(SalesforceErrorResponse{}).
+		SetBody(lead)
+	res, err := client.Do(req.Post, basePath)
+	if err != nil {
+		return nil, err
+	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return nil, err
+	}
+	result, ok := res.Result().(*RecordCreatedResponse)
+	if !ok {
+		return nil, fmt.Errorf("failed to parse response '%s'", string(res.Body()))
+	}
+	return result, nil
+}
+
+func (client *Client) DeleteLead(id string) error {
+	err := client.prepare()
+	if err != nil {
+		return err
+	}
+	basePath, err := getPath("lead")
+	if err != nil {
+		return err
+	}
+	path := fmt.Sprintf("%s/%s", basePath, id)
+	req := client.httpClient.R().SetError(SalesforceErrorResponse{})
+	res, err := client.Do(req.Delete, path)
+	if err != nil {
+		return err
+	}
+	err = client.handleObjectError(res)
+	if err != nil {
+		return err
+	}
+	return nil
 }

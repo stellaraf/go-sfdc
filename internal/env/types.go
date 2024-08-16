@@ -11,6 +11,9 @@ type TestData struct {
 	CaseCustomFieldKey    string `json:"caseCustomFieldKey"`
 	UserEmail             string `json:"userEmail"`
 	ServiceContractID     string `json:"serviceContractId"`
+	LeadID                string `json:"leadId"`
+	PicklistObject        string `json:"picklistObject"`
+	PicklistField         string `json:"picklistField"`
 }
 
 type Environment struct {

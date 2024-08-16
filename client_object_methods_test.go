@@ -27,6 +27,30 @@ func Test_Account(t *testing.T) {
 	})
 }
 
+func Test_Lead(t *testing.T) {
+	now := time.Now().Format(time.RFC3339Nano)
+	t.Run("get", func(t *testing.T) {
+		t.Parallel()
+		lead, err := Client.Lead(Env.TestData.LeadID)
+		require.NoError(t, err)
+		assert.Equal(t, Env.TestData.LeadID, lead.ID)
+	})
+	t.Run("create", func(t *testing.T) {
+		lead := &sfdc.Lead{
+			LastName: fmt.Sprintf("%s--%s", t.Name(), now),
+			Company:  Env.TestData.AccountName,
+			Email:    Env.TestData.UserEmail,
+		}
+		res, err := Client.CreateLead(lead)
+		require.NoError(t, err)
+		assert.True(t, res.Success, "non-success")
+		t.Cleanup(func() {
+			err := Client.DeleteLead(res.ID)
+			assert.NoError(t, err)
+		})
+	})
+}
+
 func Test_User(t *testing.T) {
 	t.Run("get user", func(t *testing.T) {
 		t.Parallel()

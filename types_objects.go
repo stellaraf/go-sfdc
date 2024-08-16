@@ -1,5 +1,9 @@
 package sfdc
 
+const (
+	DEFAULT_RECORD_TYPE_ID string = "012000000000000AAA"
+)
+
 type CustomFields map[string]any
 
 type Attributes struct {
@@ -347,4 +351,47 @@ type ServiceContract struct {
 	Tax                     float64  `json:"Tax,omitempty"`
 	Term                    int      `json:"Term,omitempty"`
 	TotalPrice              float64  `json:"TotalPrice,omitempty"`
+}
+
+type Lead struct {
+	BaseObject
+	Address                *Address     `json:"Address,omitempty"`
+	AnnualRevenue          float64      `json:"AnnualRevenue,omitempty"`
+	FirstName              string       `json:"FirstName,omitempty"`
+	LastName               string       `json:"LastName,omitempty"`
+	Company                string       `json:"Company,omitempty"`
+	Name                   string       `json:"Name,omitempty"`
+	Title                  string       `json:"Title,omitempty"`
+	Email                  string       `json:"Email,omitempty"`
+	Latitude               float64      `json:"latitude,omitempty"`
+	Longitude              float64      `json:"longitude,omitempty"`
+	Website                string       `json:"Website,omitempty"`
+	PhotoURL               string       `json:"PhotoUrl,omitempty"`
+	LeadSource             string       `json:"LeadSource,omitempty"`
+	ActivityMetricId       string       `json:"ActivityMetricID,omitempty"`
+	ActivityMetricRollupID string       `json:"ActivityMetricRollupId,omitempty"`
+	Status                 string       `json:"Status,omitempty"`
+	Phone                  string       `json:"Phone,omitempty"`
+	MobilePhone            string       `json:"MobilePhone,omitempty"`
+	Industry               string       `json:"Industry,omitempty"`
+	Rating                 string       `json:"Rating,omitempty"`
+	NumberOfEmployees      uint         `json:"NumberOfEmployees,omitempty"`
+	HasOptedOutOfEmail     bool         `json:"HasOptedOutOfEmail,omitempty"`
+	IsConverted            bool         `json:"IsConverted,omitempty"`
+	ConvertedDate          *Time        `json:"ConvertedDate,omitempty"`
+	ConvertedAccountID     string       `json:"ConvertedAccountId,omitempty"`
+	ConvertedContactID     string       `json:"ConvertedContactId,omitempty"`
+	ConvertedOpportunityID string       `json:"ConvertedOpportunityId,omitempty"`
+	IsUnreadByOwner        bool         `json:"IsUnreadByOwner,omitempty"`
+	LastActivityDate       *Time        `json:"LastActivityDate,omitempty"`
+	LastViewedDate         *Time        `json:"LastViewedDate,omitempty"`
+	LastReferencedDate     *Time        `json:"LastReferencedDate,omitempty"`
+	Jigsaw                 any          `json:"Jigsaw,omitempty"`
+	JigsawContactID        string       `json:"JigsawContactId,omitempty"`
+	ConnectionReceivedID   string       `json:"ConnectionReceivedId,omitempty"`
+	ConnectionSentID       string       `json:"ConnectionSentId,omitempty"`
+	EmailBouncedReason     string       `json:"EmailBouncedReason,omitempty"`
+	EmailBouncedDate       *Time        `json:"EmailBouncedDate,omitempty"`
+	IndividualID           string       `json:"IndividualId,omitempty"`
+	CustomFields           CustomFields `json:"-"`
 }
