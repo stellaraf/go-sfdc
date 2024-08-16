@@ -38,6 +38,9 @@ The following values are used in unit tests to fetch and validate data through t
 | `caseCustomFieldKey`    | Field name of a custom field on the Case object                                              |
 | `userEmail`             | Email address of the User used in the `userId` field                                         |
 | `serviceContractId`     | ID of pre-existing Service Contract object                                                   |
+| `leadId`                | ID of pre-existing Lead object                                                               |
+| `picklistField`         | API Name of pre-existing Picklist. Cannot be a managed Picklist.                             |
+| `picklistObject`        | API Name of pre-existing object that contains the Picklist referenced in `picklistField`.    |
 
 #### Example
 
