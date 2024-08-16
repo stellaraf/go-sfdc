@@ -1,6 +1,7 @@
 package sfdc
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -68,11 +69,21 @@ func New(
 	}
 	httpClient := resty.New()
 	httpClient.SetBaseURL(auth.InstanceURL.String())
+
 	client := &Client{
 		httpClient: httpClient,
 		auth:       auth,
 		timeout:    DefaultRetryDuration,
 		backoff:    backoff.NewExponentialBackOff(backoff.WithMaxElapsedTime(DefaultRetryDuration)),
 	}
+
+	httpClient.AddRetryCondition(func(r *resty.Response, err error) bool {
+		return r.StatusCode() == http.StatusUnauthorized
+	})
+	httpClient.AddRetryHook(func(r *resty.Response, _ error) {
+		if r.StatusCode() == http.StatusUnauthorized {
+			client.prepare()
+		}
+	})
 	return client, nil
 }
