@@ -359,6 +359,7 @@ type Lead struct {
 	AnnualRevenue          float64      `json:"AnnualRevenue,omitempty"`
 	FirstName              string       `json:"FirstName,omitempty"`
 	LastName               string       `json:"LastName,omitempty"`
+	Description            string       `json:"Description,omitempty"`
 	Company                string       `json:"Company,omitempty"`
 	Name                   string       `json:"Name,omitempty"`
 	Title                  string       `json:"Title,omitempty"`
