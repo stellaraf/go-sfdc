@@ -317,7 +317,7 @@ func (client *Client) CreateFeedItem(data *FeedItemOptions) (*RecordCreatedRespo
 	return result, nil
 }
 
-func (client *Client) CreateLead(lead *Lead) (*RecordCreatedResponse, error) {
+func (client *Client) CreateLead(lead *Lead, customFields ...map[string]any) (*RecordCreatedResponse, error) {
 	err := client.prepare()
 	if err != nil {
 		return nil, err
@@ -326,10 +326,14 @@ func (client *Client) CreateLead(lead *Lead) (*RecordCreatedResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+	body, err := util.MergeCustomFields(lead, customFields)
+	if err != nil {
+		return nil, err
+	}
 	req := client.httpClient.R().
 		SetResult(&RecordCreatedResponse{}).
 		SetError(SalesforceErrorResponse{}).
-		SetBody(lead)
+		SetBody(body)
 	res, err := client.Do(req.Post, basePath)
 	if err != nil {
 		return nil, err
