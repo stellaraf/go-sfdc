@@ -7,11 +7,11 @@ import (
 )
 
 type ObjectResponse struct {
-	data map[string]any
+	Data map[string]any
 }
 
 func (obj *ObjectResponse) GetString(key string) string {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return ""
 	}
@@ -23,7 +23,7 @@ func (obj *ObjectResponse) GetString(key string) string {
 }
 
 func (obj *ObjectResponse) GetInt(key string) int {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return 0
 	}
@@ -35,7 +35,7 @@ func (obj *ObjectResponse) GetInt(key string) int {
 }
 
 func (obj *ObjectResponse) GetFloat32(key string) float32 {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return float32(0.0)
 	}
@@ -47,7 +47,7 @@ func (obj *ObjectResponse) GetFloat32(key string) float32 {
 }
 
 func (obj *ObjectResponse) GetFloat64(key string) float64 {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return float64(0)
 	}
@@ -59,7 +59,7 @@ func (obj *ObjectResponse) GetFloat64(key string) float64 {
 }
 
 func (obj *ObjectResponse) GetBool(key string) bool {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return false
 	}
@@ -71,7 +71,7 @@ func (obj *ObjectResponse) GetBool(key string) bool {
 }
 
 func (obj *ObjectResponse) GetSlice(key string) []any {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return []any{}
 	}
@@ -83,7 +83,7 @@ func (obj *ObjectResponse) GetSlice(key string) []any {
 }
 
 func (obj *ObjectResponse) GetMap(key string) map[string]any {
-	gval, ok := obj.data[key]
+	gval, ok := obj.Data[key]
 	if !ok {
 		return map[string]any{}
 	}
@@ -101,7 +101,7 @@ func NewObjectResponse(data []byte) (*ObjectResponse, error) {
 		return nil, err
 	}
 	obj := &ObjectResponse{
-		data: dataMap,
+		Data: dataMap,
 	}
 	return obj, nil
 }
