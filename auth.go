@@ -1,6 +1,7 @@
 package sfdc
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"time"
@@ -48,7 +49,7 @@ func (auth *Auth) IntrospectToken(token string) (*TokenIntrospection, error) {
 		if detail != "" {
 			m += fmt.Sprintf(" due to error: %s", detail)
 		}
-		err = fmt.Errorf(m)
+		err = errors.New(m)
 		return nil, err
 	}
 	return intro, nil
@@ -79,7 +80,7 @@ func (auth *Auth) GetNewToken() (*Token, error) {
 		if detail != "" {
 			m += fmt.Sprintf(" due to error: %s", detail)
 		}
-		err = fmt.Errorf(m)
+		err = errors.New(m)
 		return nil, err
 	}
 
