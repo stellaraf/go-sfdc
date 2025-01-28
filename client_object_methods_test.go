@@ -36,10 +36,11 @@ func Test_Lead(t *testing.T) {
 		assert.Equal(t, Env.TestData.LeadID, lead.ID)
 	})
 	t.Run("create", func(t *testing.T) {
+		email, _ := random.StringURLSafe(16)
 		lead := &sfdc.Lead{
 			LastName: fmt.Sprintf("%s--%s", t.Name(), now),
 			Company:  Env.TestData.AccountName,
-			Email:    Env.TestData.UserEmail,
+			Email:    fmt.Sprintf("%s@example.com", email),
 		}
 		res, err := Client.CreateLead(lead)
 		require.NoError(t, err)
