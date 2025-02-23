@@ -186,6 +186,9 @@ type CaseUpdate struct {
 }
 
 type CaseCreate struct {
+	// Options
+	SkipAutoAssign bool `json:"-"`
+	// Fields
 	AccountID    string       `json:"AccountId,omitempty"`
 	Comments     string       `json:"Comments,omitempty"`
 	ContactID    string       `json:"ContactId,omitempty"`
@@ -193,6 +196,7 @@ type CaseCreate struct {
 	Origin       string       `json:"Origin,omitempty"`
 	Status       string       `json:"Status,omitempty"`
 	Subject      string       `json:"Subject,omitempty"`
+	OwnerID      string       `json:"OwnerId,omitempty"`
 	CustomFields CustomFields `json:"-"`
 }
 

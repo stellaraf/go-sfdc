@@ -141,7 +141,29 @@ func Test_CreateCase(t *testing.T) {
 		err = Client.UpdateCase(result.ID, &sfdc.CaseUpdate{Status: "Canceled"})
 		require.NoError(t, err)
 	})
-
+	t.Run("create a case with an owner", func(t *testing.T) {
+		t.Parallel()
+		subject := createCaseSubject(t)
+		caseData := &sfdc.CaseCreate{
+			SkipAutoAssign: true,
+			AccountID:      Env.TestData.AccountID,
+			Comments:       "go-sfdc unit test case",
+			ContactID:      Env.TestData.ContactID,
+			Description:    subject,
+			Origin:         "Web",
+			Status:         "New",
+			Subject:        subject,
+			OwnerID:        Env.TestData.UserID,
+		}
+		result, err := Client.CreateCase(caseData)
+		require.NoError(t, err)
+		assert.True(t, result.Success)
+		_case, err := Client.Case(result.ID)
+		require.NoError(t, err)
+		assert.Equal(t, Env.TestData.UserID, _case.OwnerID)
+		err = Client.UpdateCase(result.ID, &sfdc.CaseUpdate{SkipAutoAssign: true, Status: "Canceled"})
+		require.NoError(t, err)
+	})
 }
 
 func Test_CreateFeedItem(t *testing.T) {

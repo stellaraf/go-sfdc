@@ -232,7 +232,7 @@ func (client *Client) UpdateCase(id string, data *CaseUpdate, customFields ...ma
 		SetResult(&RecordCreatedResponse{}).
 		SetError(SalesforceErrorResponse{})
 
-	if data.SkipAutoAssign {
+	if data.SkipAutoAssign || data.OwnerID != "" {
 		req.SetHeader("Sforce-Auto-Assign", "FALSE")
 	}
 	res, err := client.Do(req.Patch, path)
@@ -248,7 +248,6 @@ func (client *Client) CreateCase(data *CaseCreate, customFields ...map[string]an
 	if err != nil {
 		return
 	}
-
 	basePath, err := getPath("case")
 	if err != nil {
 		return
@@ -261,6 +260,9 @@ func (client *Client) CreateCase(data *CaseCreate, customFields ...map[string]an
 		SetBody(body).
 		SetResult(&RecordCreatedResponse{}).
 		SetError(SalesforceErrorResponse{})
+	if data.SkipAutoAssign || data.OwnerID != "" {
+		req.SetHeader("Sforce-Auto-Assign", "FALSE")
+	}
 	res, err := client.Do(req.Post, basePath)
 	if err != nil {
 		return
